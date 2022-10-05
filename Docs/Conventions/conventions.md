@@ -30,6 +30,7 @@
   - Might be better to keep history idk
 - Rebase other branches as necessary
 - Try not to push to master lmao
+- Don't forget to change pull requests to my repo rather than the original one lmao
 
 ## Commits
 - Follow conventions in the `.gitmessage` template for commits
