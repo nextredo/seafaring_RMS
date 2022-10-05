@@ -9,7 +9,7 @@ High priority:
 - SkyFit
 	- Make cursor movements faster, see here: https://matplotlib.org/users/event_handling.html, the 'extra credit' solution
 
-- Photometry 
+- Photometry
   - estimate vignetting from star movements across the FOV
 
 - Solve logger picking so the code can run on Windows
