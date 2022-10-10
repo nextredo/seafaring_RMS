@@ -7,6 +7,7 @@
     - Extending the GMN to capture possibly completely unobserved meteor events (and radiants of the sky)
     - Ability to track and potentially recover meteors which land in the ocean rather than terrestrially (data from unique environment)
     - Further interest in astronomy among sailors and general public
+- Reach me at `Kurb#8806` on Discord or `@nextredo` on Twitter if you'd like to know more
 
 
 # RPi Meteor Station
