@@ -1,51 +1,8 @@
-# General
-- Styling
-  - Python Black
-- Conventional commits .gitmessage setup
-- Better sections in this list
-- Add relevant words to `.code-workspace` spellcheck section
-
-# Commenting
-- Cleanup readme foreword
-
-# Categories
-- By subsystem
-  - RMS initial setup
-    - OS config
-    - RMS base repo config
-  - Camera
-  - GPS
-  - Gimbal
-  - Software (Integration)
-    - Trajectory Estimation
-    - RMS GPS
-    - RMS Gimbal
-    - Bugfix
-
-- By type
-  - **Loosely defined as the `.gitmessage` categories**
-  - Code (Features)
-  - Physical
-    - 3D CAD and printing
-  - Test
-  - Analysis
-    - Checking
-  - Style
-  - Docs
-  - Ongoing
-  - Other
-
-# Code
--
-
-# Physical
--
-
-# Testing
--
-
-# Ongoing
-- Add unknown words to workspace .cspell
-
-# Other
-- **See MS To Do**
+# Info
+- Progress tracking done in 3 ways:
+  - Notion boards
+    - What needs to be done
+  - Git repo devlogs
+    - What has been done
+  - Microsoft todo
+    - Small stuff that doesn't make it into an epic on Notion
