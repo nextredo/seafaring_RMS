@@ -1,4 +1,5 @@
 # Info
+
 - Progress tracking done in 3 ways:
   - Notion boards
     - What needs to be done
