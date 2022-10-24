@@ -4,9 +4,9 @@
 - This project aims to expand the GMN by enabling stations to detect meteors at sea while mounted on watercraft
 - The pros to this system are as follows:
     - Meteor stations can operate from the 71% of Earth covered by water
-    - Extending the GMN to capture possibly completely unobserved meteor events (and radiants of the sky)
-    - Ability to track and potentially recover meteors which land in the ocean rather than terrestrially (data from unique environment)
-    - Further interest in astronomy among sailors and general public
+    - Extending the GMN to capture possibly completely unobserved meteor (or deorbit) events (and radiants of the sky)
+    - Ability to track and thus recover meteors which land at sea rather than on land (data from unique environment)
+    - Further interest in astronomy among seafarers and general public
 - Reach me at `Kurb#8806` on Discord or `@nextredo` on Twitter if you'd like to know more
 
 
