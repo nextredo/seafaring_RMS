@@ -38,7 +38,7 @@ def generateWebsite(output_dir, index_dir, flux_showers, ref_dt, fbr_results_all
 <center>
 <head>
         <meta charset="utf-8">
-        <title>NASA flux</title>
+        <title>Meteor shower flux</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 </head>
 
@@ -51,7 +51,7 @@ def generateWebsite(output_dir, index_dir, flux_showers, ref_dt, fbr_results_all
 <tbody>
 <tr>
     <td>
-        <a href="https://www.nasa.gov/offices/meo/home/index.html" target="_blank"><img class="logo-imgl" src="https://fireballs.ndc.nasa.gov/static/nasa_logo.png" height="126" width="157" /></a>
+        <!--<a href="https://www.nasa.gov/offices/meo/home/index.html" target="_blank"><img class="logo-imgl" src="https://fireballs.ndc.nasa.gov/static/nasa_logo.png" height="126" width="157" /></a>-->
     </td>
     <td>
         <a href="https://uwo.ca/" target="_blank"><img class="logo-imgl" src="https://globalmeteornetwork.org/static/images/uwo_logo_stacked_small.png" height="126" width="119" /></a> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
@@ -59,7 +59,7 @@ def generateWebsite(output_dir, index_dir, flux_showers, ref_dt, fbr_results_all
 
     <td>
         <center>
-        <p><h1 class="heading">NASA Meteor Shower <br> Flux Monitoring</h1></p>
+        <p><h1 class="heading">Meteor Shower <br> Flux Monitoring</h1></p>
                 Supporting data supplied by the <a href="https://globalmeteornetwork.org/" target="_blank">Global Meteor Network</a>
         </center>
     </td>
@@ -240,7 +240,7 @@ Information about the data is provided in a section below: <a href="#about">Abou
 <footer>
 <center>Supporting data supplied by the <a href="https://globalmeteornetwork.org/" target="_blank">Global Meteor Network</a>
     <br>    
-For more information, please email <a href="mailto:MSFC-fireballs@mail.nasa.gov?Subject=Flux%20Webpage" target="_top">MSFC-fireballs@mail.nasa.gov</a></center>
+<!--For more information, please email <a href="mailto:MSFC-fireballs@mail.nasa.gov?Subject=Flux%20Webpage" target="_top">MSFC-fireballs@mail.nasa.gov</a></center>-->
 </footer>
 </body>
 </center>
@@ -303,10 +303,9 @@ def loadExcludedStations(dir_path, excluded_stations_file="excluded_stations.txt
         return excluded_stations
 
 
-
-def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, metadata_dir=None, output_dir=None, 
-    csv_dir=None, index_dir=None, generate_website=False, website_plot_url=None, shower_code=None, \
-    cpu_cores=1, excluded_stations_file="excluded_stations.txt"):
+def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, all_prev_year_limit=3, \
+    metadata_dir=None, output_dir=None, csv_dir=None, index_dir=None, generate_website=False, 
+    website_plot_url=None, shower_code=None, cpu_cores=1, excluded_stations_file="excluded_stations.txt"):
     """ Given the reference time, automatically identify active showers and produce the flux graphs and
         CSV files.
 
@@ -319,6 +318,7 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, metadata_di
     Keyword arguments:
         days_prev: [int] Produce graphs for showers active N days before.
         days_next: [int] Produce graphs for showers active N days in the future.
+        all_prev_year_limit: [int] Only go back N years for the all data plot.
         metadata_dir: [str] A separate directory for flux metadata. If not given, the data directory will be
             used.
         output_dir: [str] Directory where the final data products will be saved. If None, data_path directory
@@ -516,6 +516,11 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, metadata_di
             if dir_dt.year < 2018:
                 continue
 
+            # Skip dirs that are too old to add to the all year plot
+            if (ref_dt.year - dir_dt.year) >= all_prev_year_limit:
+                print("Skipping due to {:d} year limit!".format(all_prev_year_limit))
+                continue
+
             # Compute the solar longitude of the directory time stamp
             sol_dir = jd2SolLonSteyaert(datetime2JD(dir_dt))
 
@@ -556,7 +561,7 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, metadata_di
 
     # Define binning parameters for all years
     fluxbatch_binning_params_all_years = FluxBatchBinningParams(
-        min_meteors=200, 
+        min_meteors=20,
         min_tap=100,
         min_bin_duration=1.0,
         max_bin_duration=12
@@ -564,7 +569,7 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, metadata_di
 
     # Define binning parameters for individual years
     fluxbatch_binning_params_one_year = FluxBatchBinningParams(
-        min_meteors=50,
+        min_meteors=10,
         min_tap=50,
         min_bin_duration=1.0,
         max_bin_duration=12
@@ -588,9 +593,26 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, metadata_di
             shower = active_showers_dict[shower_code]
             dir_list = shower_dir_dict[shower_code]
 
+            # Load the reference height if given
             ref_height = -1
             if shower.ref_height is not None:
                 ref_height = shower.ref_height
+
+
+            # Load the binning parameters if given
+            if shower.flux_binning_params is not None:
+
+                # Select multi-year plotting options
+                if time_extent_flag == "ALL":
+                    if 'all_years' in shower.flux_binning_params:
+                        fb_bin_params = FluxBatchBinningParams(**shower.flux_binning_params['all_years'])
+
+                else:
+                    if 'yearly' in shower.flux_binning_params:
+                        fb_bin_params = FluxBatchBinningParams(**shower.flux_binning_params['yearly'])
+
+                
+
 
             # Construct the dir input list
             dir_params = [(night_dir_path, None, None, None, None, None) for night_dir_path, _ in dir_list]
@@ -708,7 +730,7 @@ if __name__ == "__main__":
         help="Path to the directory where index.html will be placed. If not given, the output directory will be used.")
 
     arg_parser.add_argument('-w', '--weburl', metavar='WEBSITE_PLOT_PUBLIC_URL', type=str,
-        help="Public URL to where the plots are stored on the website.")
+        help="Generate a website HTML with the given public URL to where the plots are stored on the website.")
 
     arg_parser.add_argument('-s', '--shower', metavar='SHOWER', type=str,
         help="Force a specific shower. 3-letter IAU shower code is expected.")
@@ -756,9 +778,9 @@ if __name__ == "__main__":
 
         # Run auto flux
         fluxAutoRun(config, cml_args.dir_path, ref_dt, metadata_dir=cml_args.metadir,
-            output_dir=cml_args.outdir, csv_dir=cml_args.csvdir, generate_website=True, 
-            index_dir=cml_args.indexdir, website_plot_url=cml_args.weburl, shower_code=cml_args.shower,
-            cpu_cores=cml_args.cpucores)
+            output_dir=cml_args.outdir, csv_dir=cml_args.csvdir, 
+            generate_website=(cml_args.weburl is not None), index_dir=cml_args.indexdir, 
+            website_plot_url=cml_args.weburl, shower_code=cml_args.shower, cpu_cores=cml_args.cpucores)
 
 
         ### <// DETERMINE NEXT RUN TIME ###
