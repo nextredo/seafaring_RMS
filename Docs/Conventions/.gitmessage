@@ -1,0 +1,52 @@
+# <type>(scope)<optional !>: <description>
+#     type: feat, fix, build, chore, ci,
+#           docs, style, refactor, perf, test
+#     scope: module, submodule, application affected
+#     ! indicates breaking change
+#     *If applied, this commit will <description>*
+#     < 50 chars. 50 chars is ------------ here #
+
+
+# [optional body]
+#     What was changed and why (code explains the how)
+#     < 72 chars. 72 chars is ---------------------------------- here #
+
+# [optional footer(s)]
+#     Jira task in footer - eg. "refs: <TASK_ID>"
+#     < 72 chars. 72 chars is ---------------------------------- here #
+
+# *********************************************************************
+# Types
+#     feat
+#         new feature of app / library
+#     fix
+#         defect fix in existing app / library / prod code
+#     refactor
+#         eg. renaming var, rewriting class internals
+#     build
+#         changes to build sys
+#     ci
+#         continuous integration
+#     docs
+#         documentation (incl. in-code documentation)
+#     style
+#         code formatting
+#     perf
+#         production code performance, runtime, memory, size etc.
+#     test
+#         unit / integration / other tests changes
+#     chore
+#         misc. changes (no prod code change, doesn't fit other types)
+#     merge
+#         git merges
+
+# Branch naming
+#     features/<short-description-of-feature>
+#     fixes/<short-description-of-defect>
+#     releases/<software-product-name>-<major>.<minor>.x
+
+# Add this to ~./vimrc if using vim
+#     autocmd Filetype gitcommit setlocal spell textwidth=72
+
+# References
+#    https://www.conventionalcommits.org/en/v1.0.0/

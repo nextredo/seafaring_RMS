@@ -1,3 +1,15 @@
+# Foreword
+- This repository is a fork of the Global Meteor Network (GMN) [Raspberry Pi Meteor Station (RMS) repo](https://github.com/CroatianMeteorNetwork/RMS)
+- This repository is part of my final year project for my engineering bachelors
+- This project aims to expand the GMN by enabling stations to detect meteors at sea while mounted on watercraft
+- The pros to this system are as follows:
+    - Meteor stations can operate from the 71% of Earth covered by water
+    - Extending the GMN to capture possibly completely unobserved meteor (or deorbit) events (and radiants of the sky)
+    - Ability to track and thus recover meteors which land at sea rather than on land (data from unique environment)
+    - Further interest in astronomy among seafarers and general public
+- Reach me at `Kurb#8806` on Discord or `@nextredo` on Twitter if you'd like to know more
+
+
 # RPi Meteor Station
 
 Open source powered meteor station. We are currently using the Raspberry Pi 4 as the main development platform, and we use digital IP cameras. **The code also works on Linux PCs, and everything but the detection works under Windows.** We are slowly phasing out the support for analog cameras, but they should work well regardless.
@@ -38,13 +50,13 @@ This guide will assume basic knowledge of electronics, the Unix environment, and
 
 1. **Raspberry Pi 4 single-board computer.**
 
-1. **Class 10 microSD card, 64GB or higher.** 
+1. **Class 10 microSD card, 64GB or higher.**
 The recorded data takes up a lot of space, as much as several gigabytes per night. To be able to store at least one week of data on the system, a 64GB SD card is the minimum.
 
-1. **5V power supply for the RPi with the maximum current of at least 2.5A.** 
+1. **5V power supply for the RPi with the maximum current of at least 2.5A.**
 The RPi will have to power the video digitizer, and sometimes run at almost 100% CPU utilization, which draws a lot of power. We recommend using the official RPi 5V/2.5A power supply. Remember, most of the issues people have with RPis are caused by a power supply that is not powerful enough.
 
-1. **RPi case with a fan + heatsinks.** 
+1. **RPi case with a fan + heatsinks.**
 You **will** need to use a RPi case **with a fan**, as the software will likely utilize the CPU close to 100% at some time during the night. Be careful to buy a case with a fan which will not interfere with the Real Time Clock module. We recommend buying a case which allows the fan to be mounted on the outside of the case.
 
 1. **Real Time Clock module**
@@ -61,7 +73,7 @@ Preferably an IMX291 or IMX307 based camera. Contact us for more details!
 ---------
 
 1. **Security camera housing.**
-The best place to mount a meteor camera is on the outside wall of your house. As this means that the camera will be exposed to the elements, you need a good camera housing. We recommend that you get a housing with a heater and a fan, which will keep it warm in the winter and cool in the summer. Also, be sure to buy a housing large enough to accomodate your camera. There is one **important thing to note** - security camera housings **are not** designed to look up at the sky. Most of them are designed to be under a roof and looking down. As your camera will be looking up, and most likely be without the protection of a roof, you will have to properly insulate it. Buy some silicone sealant and (after you fully assemble your camera and properly test everything), apply the sealant along all openings and joints, and most importantly, along the edges of the glass at the front. You want to keep the camera dry and prevent humidity from getting inside. If you have some humidity inside the camera, when the temperature hits the dew point, everything inside the housing will be wet. People have also found that putting alumininum foil on the glass, from the inside of the housing, prevents the humidity from forming (just be careful not to obstruct the view of your camera). A good idea is also to put some silica gels or dessicant inside the housing.
+The best place to mount a meteor camera is on the outside wall of your house. As this means that the camera will be exposed to the elements, you need a good camera housing. We recommend that you get a housing with a heater and a fan, which will keep it warm in the winter and cool in the summer. Also, be sure to buy a housing large enough to accommodate your camera. There is one **important thing to note** - security camera housings **are not** designed to look up at the sky. Most of them are designed to be under a roof and looking down. As your camera will be looking up, and most likely be without the protection of a roof, you will have to properly insulate it. Buy some silicone sealant and (after you fully assemble your camera and properly test everything), apply the sealant along all openings and joints, and most importantly, along the edges of the glass at the front. You want to keep the camera dry and prevent humidity from getting inside. If you have some humidity inside the camera, when the temperature hits the dew point, everything inside the housing will be wet. People have also found that putting aluminium foil on the glass, from the inside of the housing, prevents the humidity from forming (just be careful not to obstruct the view of your camera). A good idea is also to put some silica gels or desiccant inside the housing.
 
 1. **Wiring**
 You will probably need some cables and connectors to connect your camera to the digitizer, and to bring power to you camera. We recommend using a shielded coaxial cable for the video signal, and a simple copper pair wire for the power (although you might want to get a shielded cable for power if there's a lot of interference in the video signal).
@@ -74,7 +86,7 @@ You will probably need some cables and connectors to connect your camera to the 
 
 ---------
 
-The code was designed to run on a RPi, but it will also run an some Linux distributions. We have tested it on Linux Mint 18 and Ubuntu 16. 
+The code was designed to run on a RPi, but it will also run an some Linux distributions. We have tested it on Linux Mint 18 and Ubuntu 16.
 
 The recording **will not** run on Windows, but most of other submodules will (astrometric calibration, viewing the data, manual reduction, etc.). The problem under Windows is that for some reason the logging module object cannot be pickled when parallelized by the multiprocessing library. **We weren't able to solve this issue, but we invite people to try to take a stab at it.**
 
@@ -101,7 +113,7 @@ The RMS code runs on Windows with the exception of meteor detection (I guess the
 Nevertheless, other RMS tools work well under Windows and you can follow [these instructions](https://docs.google.com/document/d/1htbyUFKD159IuB3_1HLp-tABTtlCFLMnvoH6zyojTxk/edit?usp=sharing) to install it.
 
 ### Setting the timezone to UTC
-It is always a good idea to set the timezone to UTC when recording any data. This provides a common time reference among observatons, and more than once there have been issues when people were using different time zones. So, use your favorite search engine to find how to change the timezone on your RPi to UTC.
+It is always a good idea to set the timezone to UTC when recording any data. This provides a common time reference among observations, and more than once there have been issues when people were using different time zones. So, use your favorite search engine to find how to change the timezone on your RPi to UTC.
 
 
 ### Enabling the watchdog service
@@ -116,7 +128,7 @@ The simplest way of obtaining this code is by opening the terminal and running:
 git clone https://github.com/CroatianMeteorNetwork/RMS.git
 ```
 
-This will download the code in this repository in the RMS directory. 
+This will download the code in this repository in the RMS directory.
 
 
 ### Running setup.py and compiling the Kernel-based Hough Transform module
@@ -179,7 +191,7 @@ Alternatively, if you are using IP cameras and use gstreamer for capture, you ne
 device: rtspsrc location=rtsp://192.168.42.10:554/user=admin&password=&channel=1&stream=0.sdp ! rtph264depay ! queue ! h264parse ! omxh264dec ! queue ! videoconvert ! appsink sync=1
 ```
 
-This string will make sure that the H.264 encoded video is decoded using the hardware decoding on the Pi (omxh264dec module). 
+This string will make sure that the H.264 encoded video is decoded using the hardware decoding on the Pi (omxh264dec module).
 
 If you are running on a PC, the string should look something like this:
 

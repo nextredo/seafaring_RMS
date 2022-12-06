@@ -47,8 +47,8 @@ var/
 *.egg
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+#   Usually these files are written by a python script from a template
+#   before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -83,15 +83,16 @@ target/
 # Cython compiled files
 *.pyxbldc
 
-#VS Code files
-.vscode
+# VS Code files
+# .vscode
 
-#Jetbrains code files
+# Jetbrains code files
 .idea
 
+# Local-only files
 camerasettings/*.json
 
-# these files are created by cython and should not be tracked
+# These files are created by cython and should not be tracked
 RMS/Astrometry/CyFunctions.c
 RMS/CompressionCy.c
 RMS/Routines/BinImageCy.c
