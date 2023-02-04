@@ -443,7 +443,7 @@ class InputTypeFRFF(InputType):
                         for i in range(min_frame, max_frame + 1):
 
                             # Init an empty image
-                            img = np.zeros((self.ncols, self.nrows), np.float)
+                            img = np.zeros((self.ncols, self.nrows), float)
 
                             # Compute indices on the image where the FR file will be pasted
                             x_img = np.arange(int(fr_files[fr].xc[line][i] - fr_files[fr].size[line][i]//2),
@@ -824,9 +824,11 @@ class InputTypeVideo(InputType):
         ff_struct_fake = FFMimickInterface(self.nrows, self.ncols, np.uint8)
 
         # If there are no frames to read, return an empty array
-        if frames_to_read == 0:
+        if frames_to_read == 0 or frames_to_read == -1:
             print('There are no frames to read!')
             return ff_struct_fake
+
+        print('Frames to read: ' + str(frames_to_read))
 
         # Load the chunk of frames
         for i in range(frames_to_read):

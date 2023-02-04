@@ -1115,8 +1115,8 @@ class PlateTool(QtWidgets.QMainWindow):
         Opens folder explorer window for user to select new station folder, then loads a platepar from that
         folder, and reads the config file, updating the gui to show what it should
         """
-        dir_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select new station folder",
-                                                              self.dir_path, QtGui.QFileDialog.ShowDirsOnly))
+        dir_path = str(QtWidgets.QFileDialog.getExistingDirectory(self, "Select new station folder",
+                                                              self.dir_path, QtWidgets.QFileDialog.ShowDirsOnly))
 
         if not dir_path:
             return
@@ -1471,7 +1471,7 @@ class PlateTool(QtWidgets.QMainWindow):
                 remove_under_horizon=False, sort_declination=True)
 
             # Create a mask to filter out all points outside the image and the FOV
-            filter_indices_mask = np.zeros(len(geo_xy), dtype=np.bool)
+            filter_indices_mask = np.zeros(len(geo_xy), dtype=bool)
             filter_indices_mask[filtered_indices] = True
             filtered_indices_all = filter_indices_mask & (geo_xy[:, 0] > 0) \
                                                     & (geo_xy[:, 0] < self.platepar.X_res) \
@@ -2184,7 +2184,7 @@ class PlateTool(QtWidgets.QMainWindow):
     def findLoadState(self):
         """ Opens file dialog to find .state file to load then calls loadState """
 
-        file_ = QtGui.QFileDialog.getOpenFileName(self, "Load .state file", self.dir_path,
+        file_ = QtWidgets.QFileDialog.getOpenFileName(self, "Load .state file", self.dir_path,
                                                       "State file (*.state);;All files (*)")[0]
 
         if file_:
@@ -3464,7 +3464,7 @@ class PlateTool(QtWidgets.QMainWindow):
 
         if self.v_zoom_left:
             if self.show_key_help != 2:
-                self.v_zoom.move(QtCore.QPoint(self.label1.boundingRect().width(), 0))
+                self.v_zoom.move(QtCore.QPoint(int(self.label1.boundingRect().width()), 0))
             else:
                 self.v_zoom.move(QtCore.QPoint(0, 0))
 
@@ -3830,7 +3830,7 @@ class PlateTool(QtWidgets.QMainWindow):
 
             # If the data was not being able to load from the folder, choose a file to load
             if img_handle is None:
-                self.input_path = QtGui.QFileDialog.getOpenFileName(self, "Select image/video file to open",
+                self.input_path = QtWidgets.QFileDialog.getOpenFileName(self, "Select image/video file to open",
                     self.dir_path, "All readable files (*.fits *.bin *.mp4 *.avi *.mkv *.vid *.png *.jpg *.bmp *.nef *.tif);;" + \
                                    "All files (*);;" + \
                                    "FF and FR Files (*.fits;*.bin);;" + \
@@ -3938,7 +3938,7 @@ class PlateTool(QtWidgets.QMainWindow):
             initial_file = self.dir_path
 
         # Load the platepar file
-        platepar_file = QtGui.QFileDialog.getOpenFileName(self, "Select the platepar file", initial_file,
+        platepar_file = QtWidgets.QFileDialog.getOpenFileName(self, "Select the platepar file", initial_file,
                                                           "Platepar files (*.cal);;All files (*)")[0]
 
         if platepar_file == '':
@@ -4119,7 +4119,7 @@ class PlateTool(QtWidgets.QMainWindow):
         else:
             initial_file = self.dir_path
 
-        flat_file = QtGui.QFileDialog.getOpenFileName(self, "Select the flat field file", initial_file,
+        flat_file = QtWidgets.QFileDialog.getOpenFileName(self, "Select the flat field file", initial_file,
                                                       "Image files (*.png *.jpg *.bmp);;All files (*)")[0]
 
         if not flat_file:
@@ -4165,7 +4165,7 @@ class PlateTool(QtWidgets.QMainWindow):
         else:
             initial_file = self.dir_path
 
-        dark_file = QtGui.QFileDialog.getOpenFileName(self, "Select the dark frame file", initial_file,
+        dark_file = QtWidgets.QFileDialog.getOpenFileName(self, "Select the dark frame file", initial_file,
                                                       "Image files (*.png *.jpg *.bmp *.nef *.cr2);;All files (*)")[0]
 
         if not dark_file:
@@ -4909,7 +4909,7 @@ class PlateTool(QtWidgets.QMainWindow):
 
             # Compute the background subtracted intensity sum (do as a float to avoid artificially pumping
             #   up the magnitude)
-            pick['intensity_sum'] = np.ma.sum(crop_img.astype(np.float) - background_lvl).astype(np.int)
+            pick['intensity_sum'] = np.ma.sum(crop_img.astype(float) - background_lvl).astype(int)
 
 
             # If the DFN image is used, correct intensity sum for exposure difference
@@ -5259,6 +5259,13 @@ class PlateTool(QtWidgets.QMainWindow):
         # Compute FOV size
         fov_horiz, fov_vert = computeFOVSize(self.platepar)
 
+        if self.img_handle.input_type == 'ff':
+            ff_name = self.img_handle.current_ff_file
+        else:
+            ff_name = "FF_{:s}_".format(self.platepar.station_code) \
+                          + self.img_handle.beginning_datetime.strftime("%Y%m%d_%H%M%S_") \
+                          + "{:03d}".format(int(self.img_handle.beginning_datetime.microsecond//1000)) \
+                          + "_0000000.fits"
 
         # Write the meta header
         meta_dict = {
@@ -5270,7 +5277,7 @@ class PlateTool(QtWidgets.QMainWindow):
             'cx' : self.platepar.X_res,                               # Horizontal camera resolution in pixels
             'cy' : self.platepar.Y_res,                               # Vertical camera resolution in pixels
             'photometric_band' : self.mag_band_string,                # The photometric band of the star catalogue
-            'image_file' : os.path.basename(self.input_path),         # The name of the original image or video
+            'image_file' : ff_name,                                   # The name of the original image or video
             'isodate_start_obs': str(dt_ref.strftime(isodate_format_entry)),               # The date and time of the start of the video or exposure
             'astrometry_number_stars' : len(self.platepar.star_list), # The number of stars identified and used in the astrometric calibration
             'mag_label': 'mag',                                       # The label of the Magnitude column in the Point Observation data

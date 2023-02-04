@@ -1,11 +1,14 @@
 """ Automatically runs the flux code and produces graphs on available data from multiple stations. """
 
+from __future__ import print_function, division, absolute_import
+
 import os
 import sys
 import ast
 import time
 import datetime
 import copy
+import json
 
 import numpy as np
 
@@ -18,7 +21,7 @@ from Utils.FluxBatch import fluxBatch, plotBatchFlux, FluxBatchBinningParams, sa
 from RMS.Misc import mkdirP, walkDirsToDepth
 
 
-def generateWebsite(output_dir, index_dir, flux_showers, ref_dt, fbr_results_all_years, fbr_results_ref_year, 
+def generateWebsite(index_dir, flux_showers, ref_dt, results_all_years, results_ref_year, 
     website_plot_url):
     
 
@@ -108,16 +111,16 @@ Information about the data is provided in a section below: <a href="#about">Abou
     """.format(website_plot_url)
 
     # Generate HTML with the latest results
-    for shower_code in fbr_results_ref_year:
+    for shower_code in results_ref_year:
 
         # Extract reference year results object and names of the plots files
-        fbr_ref, _, plot_name_ref, plot_name_ref_full = fbr_results_ref_year[shower_code]
+        shower_ref, _, plot_name_ref, plot_name_ref_full = results_ref_year[shower_code]
 
         # Print shower name
         shower_info = "<br><h2>#{:d} {:s} - {:s}</h2>".format(
-            fbr_ref.shower.iau_code_int, 
-            fbr_ref.shower.name, 
-            fbr_ref.shower.name_full
+            shower_ref.iau_code_int, 
+            shower_ref.name, 
+            shower_ref.name_full
             )
         html_code += shower_info
 
@@ -132,7 +135,7 @@ Information about the data is provided in a section below: <a href="#about">Abou
         html_code += img_ref_html
 
         # Extract reference year results object and name of the plot file
-        fbr_all, dir_list_all, plot_name_all, plot_name_all_full = fbr_results_all_years[shower_code]
+        shower_all, dir_list_all, plot_name_all, plot_name_all_full = results_all_years[shower_code]
 
         # Determine the range of used years
         dt_list = [dt for _, dt in dir_list_all]
@@ -305,7 +308,9 @@ def loadExcludedStations(dir_path, excluded_stations_file="excluded_stations.txt
 
 def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, all_prev_year_limit=3, \
     metadata_dir=None, output_dir=None, csv_dir=None, index_dir=None, generate_website=False, 
-    website_plot_url=None, shower_code=None, cpu_cores=1, excluded_stations_file="excluded_stations.txt"):
+    website_plot_url=None, shower_code=None, shower_suffix_filename=None, custom_binning_dict=None,
+    cpu_cores=1, excluded_stations_file="excluded_stations.txt",
+    skip_allyear=False):
     """ Given the reference time, automatically identify active showers and produce the flux graphs and
         CSV files.
 
@@ -329,9 +334,13 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, all_prev_ye
         website_plot_url: [str] Public URL to the plots, so they can be accessed online.
         shower_code: [str] Force a specific shower. None by default, in which case active showers will be
             automatically determined.
+        shower_suffix_filename: [str] Suffix to add to the shower code in the file name.
+        custom_binning_dict: [str] Custom binning parameters to be used instead of those given in the
+            flux showers files. Needs to be a dictionary in the same format as in that file.
         cpu_cores: [int] Number of CPU cores to use. If -1, all availabe cores will be used. 1 by default.
         excluded_stations_file: [str] File with excluded stations and periods. It should be in the metadata
             directory.
+        skip_allyear: [bool] Skip computing the flux with all years.
     """
 
 
@@ -361,6 +370,10 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, all_prev_ye
 
     if website_plot_url is None:
         website_plot_url = output_dir
+
+
+    if shower_suffix_filename is None:
+        shower_suffix_filename = ''
 
 
     # Load the showers for flux
@@ -577,21 +590,37 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, all_prev_ye
 
 
     # Store results in a dictionary where the keys are shower codes
-    fbr_results_all_years = {}
-    fbr_results_ref_year = {}
+    results_all_years = {}
+    results_ref_year = {}
+
+
+    # Make a list of shower parameters
+    shower_params = []
+    
+    # Add yearly data
+    shower_params.append([shower_dirs_ref_year, "REF", fluxbatch_binning_params_one_year])
+
+    # Add all year data
+    if not skip_allyear:
+        shower_params.append([     shower_dirs, "ALL", fluxbatch_binning_params_all_years])
+
 
     # Process batch fluxes for all showers
     #   2 sets of plots and CSV files will be saved: one set with all years combined, and one set with the
     #   reference year
-    for shower_dir_dict, time_extent_flag, fb_bin_params in [
-        [shower_dirs, "ALL", fluxbatch_binning_params_all_years], 
-        [shower_dirs_ref_year, "REF", fluxbatch_binning_params_one_year]
-        ]:
+    for shower_dir_dict, time_extent_flag, fb_bin_params in shower_params:
         
         for shower_code in shower_dir_dict:
 
             shower = active_showers_dict[shower_code]
             dir_list = shower_dir_dict[shower_code]
+
+
+            # Skip all-year fluxes if a one-year outburst way given
+            if time_extent_flag == "ALL":
+                if not shower.isAnnual():
+                    continue
+
 
             # Load the reference height if given
             ref_height = -1
@@ -599,17 +628,27 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, all_prev_ye
                 ref_height = shower.ref_height
 
 
+
+            # Use custom binning parameters if they are given
+            if custom_binning_dict is not None:
+                shower_flux_binning_params = custom_binning_dict
+
+            # Otherwise, use the binning parameters specified in the flux showers csv file
+            else:
+                shower_flux_binning_params = shower.flux_binning_params
+
+
             # Load the binning parameters if given
-            if shower.flux_binning_params is not None:
+            if shower_flux_binning_params is not None:
 
                 # Select multi-year plotting options
                 if time_extent_flag == "ALL":
-                    if 'all_years' in shower.flux_binning_params:
-                        fb_bin_params = FluxBatchBinningParams(**shower.flux_binning_params['all_years'])
+                    if 'all_years' in shower_flux_binning_params:
+                        fb_bin_params = FluxBatchBinningParams(**shower_flux_binning_params['all_years'])
 
                 else:
-                    if 'yearly' in shower.flux_binning_params:
-                        fb_bin_params = FluxBatchBinningParams(**shower.flux_binning_params['yearly'])
+                    if 'yearly' in shower_flux_binning_params:
+                        fb_bin_params = FluxBatchBinningParams(**shower_flux_binning_params['yearly'])
 
                 
 
@@ -635,22 +674,22 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, all_prev_ye
                 plot_suffix = "year_{:d}".format(shower.dt_max_ref_year.year)
 
             # Make a name for the plots to save (only flux + full metadata plot)
-            batch_flux_output_filename = "flux_{:s}_sol={:.2f}-{:.2f}_{:s}".format(shower_code, 
-                fbr.shower.lasun_beg, fbr.shower.lasun_end, plot_suffix)
+            batch_flux_output_filename = "flux_{:s}{:s}_sol={:.2f}-{:.2f}_{:s}".format(shower_code, 
+                shower_suffix_filename, fbr.shower.lasun_beg, fbr.shower.lasun_end, plot_suffix)
             batch_flux_output_filename_full = batch_flux_output_filename + "_full"
 
-            # Save the results to a dictionary
+            # Save the results metadata to a dictionary
             if time_extent_flag == "ALL":
-                fbr_results_all_years[shower_code] = [
-                    fbr, 
+                results_all_years[shower_code] = [
+                    shower, 
                     dir_list, 
                     batch_flux_output_filename + '.png',
                     batch_flux_output_filename_full + '.png'
                     ]
 
             else:
-                fbr_results_ref_year[shower_code] = [
-                    fbr, 
+                results_ref_year[shower_code] = [
+                    shower, 
                     dir_list, 
                     batch_flux_output_filename + '.png',
                     batch_flux_output_filename_full + '.png'
@@ -688,12 +727,18 @@ def fluxAutoRun(config, data_path, ref_dt, days_prev=2, days_next=1, all_prev_ye
             with open(os.path.join(output_dir, batch_flux_output_filename + "_camera_tally.txt"), 'w') as f:
                 f.write(tally_string)
 
+            # Delete the flux results object to free up memory
+            del fbr
+
 
     # Generate the website HTML code
     if generate_website:
+
         print("Generating website...")
-        generateWebsite(output_dir, index_dir, flux_showers, ref_dt, fbr_results_all_years, 
-            fbr_results_ref_year, website_plot_url)
+
+        generateWebsite(index_dir, flux_showers, ref_dt, results_all_years, results_ref_year, 
+            website_plot_url)
+
         print("   ... done!")
 
 
@@ -735,6 +780,13 @@ if __name__ == "__main__":
     arg_parser.add_argument('-s', '--shower', metavar='SHOWER', type=str,
         help="Force a specific shower. 3-letter IAU shower code is expected.")
 
+    arg_parser.add_argument('--suffix', metavar='SUFFIX', type=str,
+        help="Add a suffix to the shower name to differentiate the flux run it in case something special was done.")
+
+    arg_parser.add_argument('--binning', metavar='BINNING', type=str,
+        help="""Specify custom binning parameters instead of those used in the flux shower file. Usage example:
+        --binning "{'all_years': {'min_tap':   50, 'min_meteors':  35, 'min_bin_duration': 0.5, 'max_bin_duration': 12}, 'yearly': {'min_tap':  30, 'min_meteors':  20, 'min_bin_duration': 0.5, 'max_bin_duration': 12}}" """)
+
     arg_parser.add_argument('-a', '--auto', metavar='H_FREQ', type=float, default=None, const=1.0, 
         nargs='?',
         help="""Run continously every H_FREQ hours. If argument not given, the code will run every hour."""
@@ -747,6 +799,10 @@ if __name__ == "__main__":
         help="Number of CPU codes to use for computation. -1 to use all cores. 1 by default.",
     )
 
+    arg_parser.add_argument('--skipallyear', action="store_true", \
+        help="""Skip computing multi-year fluxes. Only compute fluxes for the given year.""")
+
+
     # Parse the command line arguments
     cml_args = arg_parser.parse_args()
 
@@ -756,6 +812,17 @@ if __name__ == "__main__":
     # Load the default config file
     config = cr.Config()
     config = cr.parse(config.config_file_name)
+
+
+    # Load the custom binning as a dictionary
+    custom_binning_dict = None
+    if cml_args.binning is not None:
+        
+        # Strip quotes from ends of string, convert all apostrophes to quotes
+        binning_formatted = cml_args.binning.strip('"').strip("'").replace("'", '"')
+
+        # Load JSON as dictionary
+        custom_binning_dict = json.loads(binning_formatted)
 
 
 
@@ -780,7 +847,10 @@ if __name__ == "__main__":
         fluxAutoRun(config, cml_args.dir_path, ref_dt, metadata_dir=cml_args.metadir,
             output_dir=cml_args.outdir, csv_dir=cml_args.csvdir, 
             generate_website=(cml_args.weburl is not None), index_dir=cml_args.indexdir, 
-            website_plot_url=cml_args.weburl, shower_code=cml_args.shower, cpu_cores=cml_args.cpucores)
+            website_plot_url=cml_args.weburl, shower_code=cml_args.shower, \
+            shower_suffix_filename=cml_args.suffix, custom_binning_dict=custom_binning_dict,
+            cpu_cores=cml_args.cpucores,
+            skip_allyear=cml_args.skipallyear)
 
 
         ### <// DETERMINE NEXT RUN TIME ###
