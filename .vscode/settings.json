@@ -74,5 +74,6 @@
         "videoconvert",
         "vimrc",
         "virtualenv"
-    ]
+    ],
+    "cmake.configureOnOpen": false
 }

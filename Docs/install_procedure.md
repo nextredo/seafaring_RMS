@@ -62,6 +62,7 @@ conda activate RMS_3_8
 
 - [X] Configuration complete?
 - This is covered in the [`README`](./../README.md#editing-the-configuration-file)
+  - Need to use the file [`.config_template`](../.config_template), change it and rename to [`.config`](../.config)
 - Must set the following settings in it:
   - Station ID
     - Leaving as `XX0001` for testing
