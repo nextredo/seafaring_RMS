@@ -72,7 +72,7 @@ share_files = [os.path.join('share', file_name) for file_name in os.listdir(os.p
 setup (name = "RMS",
         version = "0.1",
         description = "Raspberry Pi Meteor Station",
-        setup_requires=["numpy", 
+        setup_requires=["numpy",
         # Setuptools 18.0 properly handles Cython extensions.
             'setuptools>=18.0',
             'cython'],

@@ -54,6 +54,7 @@
         "platepar",
         "prac",
         "pyephem",
+        "pyfits",
         "pyqtgraph",
         "rawpy",
         "relu",
@@ -69,7 +70,9 @@
         "taglist",
         "teleoperate",
         "textwidth",
+        "tkinter",
         "videoconvert",
-        "vimrc"
+        "vimrc",
+        "virtualenv"
     ]
 }

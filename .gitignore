@@ -80,6 +80,9 @@ docs/_build/
 target/
 *.npz
 
+# Configuration files (containing sensitive data)
+.config
+
 # Cython compiled files
 *.pyxbldc
 
