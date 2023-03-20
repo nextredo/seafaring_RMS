@@ -2,6 +2,11 @@
 
 - This document helps fix git troubles like remembering passwords or using more than 1 account
 
+## Important Note
+
+- [Git Credential Manager (GCM)](https://github.com/git-ecosystem/git-credential-manager)
+- Super useful for GitHub access since they stopped HTTPS with normal password use
+
 ## Multiple GitHub accounts (Windows)
 
 - [This article](https://medium.com/@pinglinh/how-to-have-2-github-accounts-on-one-machine-windows-69b5b4c5b14e)

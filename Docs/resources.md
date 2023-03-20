@@ -34,6 +34,7 @@
 
 - [GMN wiki Linux installation](https://globalmeteornetwork.org/wiki/index.php?title=Installation_for_Linux)
 - [RPi4 (and general Linux) Installation and OS configuration](https://docs.google.com/document/d/19ImeNqBTD1ml2iisp5y7CjDrRV33wBeF9rtx3mIVjh4/edit)
+- [RMS on Linux with support for multiple cameras - Ubuntu 20.04 setup](https://docs.google.com/document/d/e/2PACX-1vTh_CtwxKu3_vxB6YpEoctLpsn5-v677qJgWsYi6gEr_QKacrfrfIz4lFM1l-CZO86t1HwFfk3P5Nb6/pub)
 
 ### RMS Camera setup
 
