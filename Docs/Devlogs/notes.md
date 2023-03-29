@@ -10,16 +10,4 @@
 
 ## File Template (copy all below this line)
 
-````markdown
-# Devlog dd/mm/yyyy
-
-```text
-tags: #example, #example2
-```
-
-## Notes
-
-## TODO
-
-- [ ] thing
-````
+- See [template.md](template.md)
