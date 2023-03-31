@@ -107,6 +107,7 @@ conda activate RMS_3_8
 - GPS uses a few Python libraries. Run the install script below to download them into the conda environment.
 
 ```bash
+sudo adduser "$USER" dialout
 pip install pyserial pynmea2 geopandas contextily
 ```
 
