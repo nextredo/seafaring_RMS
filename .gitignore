@@ -80,9 +80,6 @@ docs/_build/
 target/
 *.npz
 
-# Configuration files (containing sensitive data)
-.config
-
 # Cython compiled files
 *.pyxbldc
 
@@ -103,3 +100,7 @@ RMS/Routines/DynamicFTPCompressionCy.c
 RMS/Routines/Grouping3Dcy.c
 RMS/Routines/MorphCy.c
 Utils/SaturationTools.c
+
+# Exclude files / dirs containing sensitive data
+.config
+Tests/gps/data
