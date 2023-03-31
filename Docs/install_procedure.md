@@ -102,6 +102,14 @@ conda activate RMS_3_8
 
 ### Camera Config
 
+### GPS Config
+
+- GPS uses a few Python libraries. Run the install script below to download them into the conda environment.
+
+```bash
+pip install pyserial pynmea2 geopandas contextily
+```
+
 ### RMS Config
 
 - [ ] Generate desktop links for ease of use
