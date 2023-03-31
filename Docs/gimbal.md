@@ -25,11 +25,13 @@ Baud rate: 115200
 
 ### Gimbal GUI Controller
 
+[**Important Link - Getting Started with the gimbal**](http://www.olliw.eu/storm32bgc-wiki/Getting_Started)
+
 - Releases for Olliw42's [`o323BGCTool GUI Tool`](https://github.com/olliw42/storm32bgc/tree/master/firmware%20binaries%20%26%20gui)
-- Need to use the `v0.90` release for this tool (for the factory defaults)
+- Need to use the `v0.90` release for this tool (for the factory default firmware)
   - Just use whatever release corresponds to the firmware on your board (can check with Arduino serial monitor, sending a "v" character)
   - Windows-only tool (haven't tried with Wine)
 
 #### Flashing New Firmware
 
-- [ ] Try `0.90` --> `0.96` upgrade through STLink
+- [X] Try `0.90` --> `0.96` upgrade through STLink

@@ -2,10 +2,18 @@
 
 - This document helps fix git troubles like remembering passwords or using more than 1 account
 
-## Important Note
+## Important Notes
+
+### Note 1
 
 - [Git Credential Manager (GCM)](https://github.com/git-ecosystem/git-credential-manager)
 - Super useful for GitHub access since they stopped HTTPS with normal password use
+
+### Note 2
+
+- Most uploads to git are from Borealis
+- Borealis currently set to UTC time
+- This means file modification times might be inaccurate
 
 ## Multiple GitHub accounts (Windows)
 
