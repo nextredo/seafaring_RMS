@@ -18,6 +18,11 @@
 - `RS232-TTL` interface
   - `9600 baud` default
 - `MS621FE` battery
+  - Nominal `3v`
+  - Mine's at `2.14v`
+  - Replaced battery with `CR2032`
+    - Battery had nominal `3v`
+    - Measured `2.6v` when connected to module
 - EEPROM for config data
 -
 
