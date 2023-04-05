@@ -8,6 +8,17 @@
   - Python bindings
   - Usage in `seafaring_RMS`
 
+## GPS Overview
+
+- L1 band extremely common for GPS / GNSS
+  - E1 too - same centre freq as L1 just bigger bandwidth
+
+```text
+GPS L1 Band: 1575.42 MHz with a bandwidth of 15.345 MHz - 0.19 metre wavelength
+GPS L2 Band: 1227.6  MHz with a bandwidth of 11     MHz - 0.24 metre wavelength
+GPS L5 Band: 1176.45 MHz with a bandwidth of 12.5   MHz - 0.25 metre wavelength
+```
+
 ## Software
 
 ### [u-blox u-center](https://www.u-blox.com/en/product/u-center)
@@ -17,7 +28,7 @@
 - GUI tool for u-blox chips
 - Highly useful
 
-## Modules
+## Hardware
 
 ### NEO-6M GPS Module
 
