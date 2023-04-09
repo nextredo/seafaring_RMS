@@ -23,7 +23,7 @@ GPS L5 Band: 1176.45 MHz with a bandwidth of 12.5   MHz - 0.25 metre wavelength
 
 ### [u-blox u-center](https://www.u-blox.com/en/product/u-center)
 
-[<img src="./images/u-center2_web.png" width="450"/>](./images/u-center2_web.png)
+[<img src="./images/u-center2_web.png" width="650"/>](./images/u-center2_web.png)
 
 - GUI tool for u-blox chips
 - Highly useful

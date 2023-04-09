@@ -1,10 +1,24 @@
 # Resources
 
-- This document contains a list of sources to help build a GMN RMS system
+- This document contains a list of sources to:
+  - Help build a GMN RMS system / seafaring RMS system
+    - Build documentation
+    - Install documentation
+    - Testing documentation
+  - Learn about the GMN
 
 ---------------------------
 
-## RMS resources
+## GMN (Global Meteor Network)
+
+### Overview Resources
+
+- [International Meteor Conference 2020 - GMN Overview](https://www.youtube.com/watch?v=MAGq-XqD5Po&ab_channel=GlobalMeteorNetwork)
+  - Great video to start with
+
+---------------------------
+
+## RMS (Raspberry Pi Meteor Station) resources
 
 ### RMS Repositories
 
@@ -35,6 +49,7 @@
 - [GMN wiki Linux installation](https://globalmeteornetwork.org/wiki/index.php?title=Installation_for_Linux)
 - [RPi4 (and general Linux) Installation and OS configuration](https://docs.google.com/document/d/19ImeNqBTD1ml2iisp5y7CjDrRV33wBeF9rtx3mIVjh4/edit)
 - [RMS on Linux with support for multiple cameras - Ubuntu 20.04 setup](https://docs.google.com/document/d/e/2PACX-1vTh_CtwxKu3_vxB6YpEoctLpsn5-v677qJgWsYi6gEr_QKacrfrfIz4lFM1l-CZO86t1HwFfk3P5Nb6/pub)
+- [SkyFit2 tutorial (updated for 2023 version)](https://www.youtube.com/watch?v=ao3J9Jf0iLQ)
 
 ### RMS Camera setup
 
@@ -62,9 +77,18 @@
 ### Gimbal Wikis
 
 - [Olliw42's wiki](http://www.olliw.eu/storm32bgc-wiki/Main_Page)
-  - [Manuals and Tutorials list](http://www.olliw.eu/storm32bgc-wiki/Manuals_and_Tutorials)
+  - [**Manuals and Tutorials list**](http://www.olliw.eu/storm32bgc-wiki/Manuals_and_Tutorials)
 - [itsqv wiki](https://www.itsqv.com/QVM/index.php?title=How_To_-_Martinez_Brushless_Gimbal_Controller_Set-Up)
 
 ### Gimbal Support
 
 - [RCGroups Thread (STorM32)](https://www.rcgroups.com/forums/showthread.php?2055844-STorM32-BGC-32-bit-3-axis-brushless-gimbal-controller)
+
+---------------------------
+
+## Test Resources
+
+- [Per-hour forecast (incl. cloud cover)](https://www.timeanddate.com/weather/australia/melbourne/hourly)
+- [Mount Burnett Observatory Sky Dome](https://mbo.org.au/live-sky-dome/)
+  - [Mt. Burnett Allsky Camera Stream](https://skypi.mbo.org.au/allsky/)
+  - Good for assessing cloud coverage
