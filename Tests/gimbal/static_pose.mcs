@@ -1,0 +1,7 @@
+TextOut("Start\n");
+TextOut("Centering camera\n");  # display text in the message console
+RecenterCamera();               # recenters all three axes
+Wait(5);                        # waits 3 seconds
+
+TextOut("Moving to observation position\n");
+SetAngle(-25, 0, 0);            # +ve = downwards, -ve = upwards
