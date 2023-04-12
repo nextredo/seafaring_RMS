@@ -8,6 +8,7 @@
 ## Data
 
 ```text
+
 Please do first a read to get controller settings!
 
 Connecting... Please wait!
@@ -140,7 +141,7 @@ s... ok
   IMU2 is not available
   MAG is not available
   STorM32-LINK is not available
-  STATE is SETTLE
+  STATE is NORMAL
   BAT is CONNECTED, VOLTAGE is OK: 12.25 V
 Get Status... DONE!
 
@@ -150,13 +151,18 @@ FA0E1100000000000000000000000000003334
 FB019600622E LEN:1 COUNT:6 CRC:2E62 CRC2:0x0000!
 
 SetAngle
-1.00000E+000,2.00000E+000,3.00000E+000,0,0!
-FA0E110000803F000000400000404000003334
+4.50000E+001,4.50000E+001,4.50000E+001,0,0!
+FA0E1100003442000034420000344200003334
 FB019600622E LEN:1 COUNT:6 CRC:2E62 CRC2:0x0000!
 
 SetAngle
-4.00000E+000,5.00000E+000,6.00000E+000,0,0!
-FA0E11000080400000A0400000C04007003334
+-4.50000E+001,-4.50000E+001,-4.50000E+001,0,0!
+FA0E11000034C2000034C2000034C200003334
+FB019600622E LEN:1 COUNT:6 CRC:2E62 CRC2:0x0000!
+
+SetAngle
+0.00000E+000,0.00000E+000,0.00000E+000,0,0!
+FA0E1100000000000000000000000000003334
 FB019600622E LEN:1 COUNT:6 CRC:2E62 CRC2:0x0000!
 
 Get Version
@@ -175,4 +181,18 @@ FB019600622E LEN:1 COUNT:6 CRC:2E62 CRC2:0x0000!
 CONNECTION is LOST!
 
 Please do first a read to get controller settings!
+```
+
+## Manually testing my library against the GUI
+
+```
+gui:  FA020CE8033334
+mine: FA020CBC023334
+
+Breakdown from http://www.olliw.eu/storm32bgc-wiki/Serial_Communication
+
+CMD_SETYAW (#12)
+0xFA 0x02 0x0C data-low-byte data-high-byte crc-low-byte crc-high-byte
+
+The data is of type uint16_t and can assume the values 700...2300. It represents the yaw input value. If the value 0 is send, then the yaw axis will be recentered. Any other values are ignored. As response to this command a CMD_ACK message will be emitted.
 ```

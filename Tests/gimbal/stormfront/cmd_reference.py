@@ -47,14 +47,15 @@ class type_ref(Enum):
 
 # todo change enums to the below
 # class command():
-#     def __init__(self, cmd_byte: bytes, payload_len: bytes):
+#     def __init__(self,cmd_string, cmd_byte: bytes, payload_len: bytes):
+#         self.cmd_string = cmd_string
 #         self.cmd_byte = cmd_byte
 #         self.payload_len = payload_len
 
 # class cmd_ref_v2(Enum):
-#     CMD_SETPITCH = command(b'\x0A', b'\x02')
-#     CMD_SETROLL  = command(b'\x0B', b'\x02')
-#     CMD_SETYAW   = command(b'\x0C', b'\x02')
+#     CMD_SETPITCH = command("CMD_SETPITCH", b'\x0A', b'\x02')
+#     CMD_SETROLL  = command("CMD_SETROLL", b'\x0B', b'\x02')
+#     CMD_SETYAW   = command("CMD_SETYAW", b'\x0C', b'\x02')
 
 
 # test = command(b"\x33", b"\xdd")
