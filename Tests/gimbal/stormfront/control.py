@@ -20,39 +20,16 @@ import struct
 import ctypes
 
 import crc
+from cmd_reference import cmd_ref, byte_ref, flag_ref, type_ref
 
 class serial_man:
-    """
-    Serial manager class
-    """
-    # Static class variables ---------------------------------------------------
-
-    # command bytes
-    CMD_DSDDDDDDDSDSDASDSADDASS = b'\x22'
-    CMD_SETPITCH = b'\x0A'
-    CMD_SETROLL  = b'\x0B'
-    CMD_SETYAW   = b'\x0C'
-
-    # message bytes
-    byte_incoming_start             = b'\xFB'
-    byte_outgoing_start             = b'\xFA'
-    byte_outgoing_start_no_response = b'\xF9'
-    bytes_dummy_crc                 = b'\x33\x34'
-
-    # message flags
-    flag_unlimited_angles   = b'\x00'
-    flag_all_limited_angles = b'\x07'
-
-    # message payload data types
-    type_gimbal_frame_euler_angles = b'\x00'
-
     def __init__(self, gimbal_port: str, baud: int,):
         self.ser = serial.Serial(port=gimbal_port, baudrate=baud)
         self.ser.flush()
         return
 
     # Class methods ------------------------------------------------------------
-
+    # --------------------------------------------------------------------------
     def send(self, cmd_byte, payload, payload_len, crc_type='d'):
         """
         Constructs and sends a message to the gimbal.
@@ -65,11 +42,8 @@ class serial_man:
             `n` for no CRC, `h` for the lower byte of the CRC, `f` for the full CRC
             `d` for dummy CRC.
         """
-        # b'\0xFA' = out startsign
-        # x25crc(msg) ensure to strip first bit
-        # msg = startsign + payload length + command byte + payload / data + crc word
         if crc_type == "d":
-            msg = serial_man.byte_outgoing_start + payload_len + cmd_byte + payload + serial_man.bytes_dummy_crc
+            msg = byte_ref.byte_outgoing_start + payload_len + cmd_byte + payload + byte_ref.bytes_dummy_crc
 
         self.ser.write(msg)
 
@@ -77,6 +51,11 @@ class serial_man:
         return
 
     # Static methods -----------------------------------------------------------
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def gui_formatted_cmd_string(command: str):
+        return
+
     @staticmethod
     def float_to_bytes(num: float):
         return struct.pack("f", num)
@@ -120,6 +99,7 @@ class storm32(serial_man):
         super().__init__(gimbal_port, baud)
 
     # Getters ------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def get_firmware_version(self):
         return
 
@@ -127,6 +107,7 @@ class storm32(serial_man):
         return
 
     # Setters ------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def set_angles(self, pitch: float, roll: float, yaw: float):
 
         # Encode floats into formatted payload bytes
@@ -135,9 +116,9 @@ class storm32(serial_man):
         yaw_payload   = serial_man.encode_angle(yaw)
 
         # Sending commands to gimbal
-        self.send(b'\x0A', pitch_payload, b'\x02', crc_type='d') # CMD_SETPITCH
-        self.send(b'\x0B', roll_payload , b'\x02', crc_type='d') # CMD_SETROLL
-        self.send(b'\x0C', yaw_payload  , b'\x02', crc_type='d') # CMD_SETYAW
+        self.send(cmd_ref.CMD_SETPITCH, pitch_payload, b'\x02', crc_type='d')
+        self.send(cmd_ref.CMD_SETROLL,  roll_payload,  b'\x02', crc_type='d')
+        self.send(cmd_ref.CMD_SETYAW,   yaw_payload,   b'\x02', crc_type='d')
 
         # self.send(self, b'\x11', payload, b'\x0E', crc_type='d') # CMD_SETANGLES
         return

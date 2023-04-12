@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-import Tests.gimbal.stormfront.control as ctrl
+# import Tests.gimbal.stormfront.control as ctrl
+import control as ctrl
 import time
 
-gimbal = ctrl.STorM32("/dev/ttyACM0", 115200)
+gimbal = ctrl.storm32("/dev/ttyACM0", 115200)
 gimbal.set_angles(20.0, 20.0, 20.0)
 
 # Run loop (for 5 sec) looking for responses from the board
