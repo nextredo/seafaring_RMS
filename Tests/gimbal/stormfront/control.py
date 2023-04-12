@@ -19,51 +19,12 @@ import serial
 import struct
 import ctypes
 
-# Code taken from PyMavlink
-# from pymavlink import generator.mavcrc as mavcrc
-'''
-MAVLink CRC-16/MCRF4XX code
+import crc
 
-Copyright Andrew Tridgell
-Released under GNU LGPL version 3 or later
-'''
-
-class x25crc(object):
-    '''
-    CRC-16/MCRF4XX - based on checksum.h from mavlink library
-    The checksum for protecting some data packets is the x25 16-bit crc used by MAVLink.
-    '''
-    def __init__(self, buf=None):
-        self.crc = 0xffff
-        if buf is not None:
-            if isinstance(buf, str):
-                self.accumulate_str(buf)
-            else:
-                self.accumulate(buf)
-
-    def accumulate(self, buf):
-        '''add in some more bytes'''
-        accum = self.crc
-        for b in buf:
-            tmp = b ^ (accum & 0xff)
-            tmp = (tmp ^ (tmp<<4)) & 0xFF
-            accum = (accum>>8) ^ (tmp<<8) ^ (tmp<<3) ^ (tmp>>4)
-        self.crc = accum
-
-    def accumulate_str(self, buf):
-        '''add in some more bytes'''
-        accum = self.crc
-        import array
-        bytes_array = array.array('B')
-        try:  # if buf is bytes
-            bytes_array.frombytes(buf)
-        except TypeError:  # if buf is str
-            bytes_array.frombytes(buf.encode())
-        except AttributeError:  # Python < 3.2
-            bytes_array.fromstring(buf)
-        self.accumulate(bytes_array)
-
-class STorM32_serial_manager:
+class serial_man:
+    """
+    Serial manager class
+    """
     # Static class variables ---------------------------------------------------
 
     # command bytes
@@ -108,7 +69,7 @@ class STorM32_serial_manager:
         # x25crc(msg) ensure to strip first bit
         # msg = startsign + payload length + command byte + payload / data + crc word
         if crc_type == "d":
-            msg = STorM32_serial_manager.byte_outgoing_start + payload_len + cmd_byte + payload + STorM32_serial_manager.bytes_dummy_crc
+            msg = serial_man.byte_outgoing_start + payload_len + cmd_byte + payload + serial_man.bytes_dummy_crc
 
         self.ser.write(msg)
 
@@ -129,7 +90,7 @@ class STorM32_serial_manager:
         # todo unsure if necessary, not putting it in for the mean time
 
         # Float to bytes
-        return STorM32_serial_manager.float_to_bytes(angle)
+        return serial_man.float_to_bytes(angle)
 
     @staticmethod
     def encode_to_ranged_uint16(self, num):
@@ -142,7 +103,7 @@ class STorM32_serial_manager:
         return
 
 
-class STorM32(STorM32_serial_manager):
+class storm32(serial_man):
     def __init__(
             self,
             gimbal_port,
@@ -169,9 +130,9 @@ class STorM32(STorM32_serial_manager):
     def set_angles(self, pitch: float, roll: float, yaw: float):
 
         # Encode floats into formatted payload bytes
-        pitch_payload = STorM32_serial_manager.encode_angle(pitch)
-        roll_payload  = STorM32_serial_manager.encode_angle(roll)
-        yaw_payload   = STorM32_serial_manager.encode_angle(yaw)
+        pitch_payload = serial_man.encode_angle(pitch)
+        roll_payload  = serial_man.encode_angle(roll)
+        yaw_payload   = serial_man.encode_angle(yaw)
 
         # Sending commands to gimbal
         self.send(b'\x0A', pitch_payload, b'\x02', crc_type='d') # CMD_SETPITCH

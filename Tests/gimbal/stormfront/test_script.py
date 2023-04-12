@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import STorM32_ctrl as ctrl
+import Tests.gimbal.stormfront.control as ctrl
 import time
 
 gimbal = ctrl.STorM32("/dev/ttyACM0", 115200)
