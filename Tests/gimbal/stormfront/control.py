@@ -14,23 +14,31 @@ Class construction based off the following:
 # todo instead of superclassing, make the serial manager a subclass with it's own functions
     # mainly functions like CMD_SETPITCH etc.
 
-from builtins import object
-import serial
 import struct
 import ctypes
 
-import crc
-from cmd_reference import cmd_ref, byte_ref, flag_ref, type_ref
+import serial
+
+from .crc import x25crc
+from .cmd_reference import cmd_ref, byte_ref, flag_ref, type_ref
 
 class serial_man:
-    def __init__(self, gimbal_port: str, baud: int,):
+    def __init__(self, gimbal_port: str, baud: int):
         self.ser = serial.Serial(port=gimbal_port, baudrate=baud)
         self.ser.flush()
         return
 
     # Class methods ------------------------------------------------------------
     # --------------------------------------------------------------------------
-    def send(self, cmd_byte, payload, payload_len, crc_type='d'):
+    def send(
+            self,
+            cmd_byte: bytes,
+            payload: bytes,
+            payload_len: bytes,
+            flags=b'',
+            payload_type=b'',
+            crc_type='d'
+        ):
         """
         Constructs and sends a message to the gimbal.
         See [the serial comms wiki page](http://www.olliw.eu/storm32bgc-wiki/Serial_Communication)
@@ -43,9 +51,10 @@ class serial_man:
             `d` for dummy CRC.
         """
         if crc_type == "d":
-            msg = byte_ref.byte_outgoing_start + payload_len + cmd_byte + payload + byte_ref.bytes_dummy_crc
+            msg = byte_ref.byte_outgoing_start.value + payload_len + cmd_byte + payload + flags + payload_type + byte_ref.bytes_dummy_crc.value
 
         self.ser.write(msg)
+        return msg
 
     def receive(self):
         return
@@ -53,8 +62,20 @@ class serial_man:
     # Static methods -----------------------------------------------------------
     # --------------------------------------------------------------------------
     @staticmethod
-    def gui_formatted_cmd_string(command: str):
-        return
+    def format_cmd_string(command: str | bytes, hex_prefix=True):
+        if type(command) == str:
+            hex_str = bytes(command, "utf-8").hex()
+
+        elif type(command) == bytes:
+            hex_str = command.hex()
+
+        # Make hex values uppercase
+        formatted_command = hex_str.upper()
+
+        if hex_prefix:
+            formatted_command = "0x" + formatted_command
+
+        return formatted_command
 
     @staticmethod
     def float_to_bytes(num: float):
@@ -72,13 +93,19 @@ class serial_man:
         return serial_man.float_to_bytes(angle)
 
     @staticmethod
-    def encode_to_ranged_uint16(self, num):
+    def encode_to_ranged_uint16(num):
         # % 360 to get base angle
-        # Map degrees to
+        # Map degrees to range [700, 2300]
+
+        # Convert to int in range
+
+        # Encode as uint16_t
+
+        # Swap low byte and high byte
         return
 
     @staticmethod
-    def calculate_msg_len(self):
+    def calculate_msg_len():
         return
 
 
@@ -115,12 +142,41 @@ class storm32(serial_man):
         roll_payload  = serial_man.encode_angle(roll)
         yaw_payload   = serial_man.encode_angle(yaw)
 
-        # Sending commands to gimbal
-        self.send(cmd_ref.CMD_SETPITCH, pitch_payload, b'\x02', crc_type='d')
-        self.send(cmd_ref.CMD_SETROLL,  roll_payload,  b'\x02', crc_type='d')
-        self.send(cmd_ref.CMD_SETYAW,   yaw_payload,   b'\x02', crc_type='d')
+        # Packing encoded floats into single payload
+        payload = b''.join([
+            pitch_payload,
+            roll_payload,
+            yaw_payload
+        ])
 
-        # self.send(self, b'\x11', payload, b'\x0E', crc_type='d') # CMD_SETANGLES
+        # Sending command to gimbal
+        set_angles_msg = self.send(
+            cmd_byte=cmd_ref.CMD_SETANGLES.value,
+            payload=payload,
+            payload_len=b'\x0E',
+            flags=b'\x00',
+            payload_type=b'\x00',
+            crc_type='d'
+        )
+
+        if self.verbose:
+            print("->", serial_man.format_cmd_string(set_angles_msg, hex_prefix=False))
+
+        return
+
+    def set_pitch(self, pitch: float):
+        return
+
+    def set_roll(self, roll: float):
+        return
+
+    def set_yaw(self, yaw: float):
+        yaw_payload = serial_man.encode_angle(yaw)
+        yaw_msg     = self.send(cmd_ref.CMD_SETYAW.value, yaw_payload, b'\x02', crc_type='d')
+
+        if self.verbose:
+            print("->", serial_man.format_cmd_string(yaw_msg, hex_prefix=False))
+
         return
 
     def set_angle_limits(self):

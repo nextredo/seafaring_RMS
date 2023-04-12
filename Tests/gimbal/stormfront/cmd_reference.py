@@ -7,16 +7,20 @@ File containing a reference for STorM32 serial command bytes, such as:
 - flag bytes
 - payload type bytes
 Makes the codebase more readable
+
+See [Serial Communication](http://www.olliw.eu/storm32bgc-wiki/Serial_Communication) on the wiki
 """
 from enum import Enum
+from builtins import object
 
 class cmd_ref(Enum):
     """
     Enum of command reference bytes
     """
-    CMD_SETPITCH = b'\x0A'
-    CMD_SETROLL  = b'\x0B'
-    CMD_SETYAW   = b'\x0C'
+    CMD_SETPITCH  = b'\x0A' #10
+    CMD_SETROLL   = b'\x0B' #11
+    CMD_SETYAW    = b'\x0C' #12
+    CMD_SETANGLES = b'\x11' #17
 
 class byte_ref(Enum):
     """
@@ -39,6 +43,23 @@ class type_ref(Enum):
     Enum of payload type references
     """
     type_gimbal_frame_euler_angles = b'\x00'
+
+
+# todo change enums to the below
+# class command():
+#     def __init__(self, cmd_byte: bytes, payload_len: bytes):
+#         self.cmd_byte = cmd_byte
+#         self.payload_len = payload_len
+
+# class cmd_ref_v2(Enum):
+#     CMD_SETPITCH = command(b'\x0A', b'\x02')
+#     CMD_SETROLL  = command(b'\x0B', b'\x02')
+#     CMD_SETYAW   = command(b'\x0C', b'\x02')
+
+
+# test = command(b"\x33", b"\xdd")
+# test.cmd_byte
+# cmd_ref_v2.CMD_SETPITCH.cmd_byte
 
 """
 Storage:
