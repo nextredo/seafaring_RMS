@@ -20,6 +20,7 @@ conda install python=3.8.6 -y
 conda install -y numpy scipy gitpython cython matplotlib
 conda install -y -c conda-forge ephem Pillow imreg_dft imageio pyqtgraph'<=0.12.1'
 conda install -y -c astropy astropy
+conda install -y pyserial
 pip install rawpy
 
 # Installing OpenCV with FFmpeg and Gstreamer support
