@@ -4,9 +4,10 @@ import serial
 from STorM32_lib import *
 
 
-uart = "COM23"
-uart = "COM21"
-#uart = "COM9"
+# uart = "COM23"
+# uart = "COM21"
+# uart = "COM9"
+uart = "/dev/ttyACM0"
 baud = 115200
 
 display = True
@@ -24,7 +25,7 @@ if len(sys.argv) > 1:
         baud = 921600
 
 
-ser = serial.Serial(uart, baud) 
+ser = serial.Serial(uart, baud)
 t1Hz_last = time.perf_counter()
 
 pitch = 0.0
@@ -38,9 +39,9 @@ while True:
     tnow = time.perf_counter()
     if tnow - t1Hz_last > 1.0:
         t1Hz_last += 1.0
-        if display: 
+        if display:
             print('-- 1Hz --')
-            
+
 #        cmd = cCMD_GETVERSION(ser)
 #        cmd = cCMD_GETVERSIONSTR(ser)
 #        cmd = cCMD_SENDCAMERACOMMAND(ser)

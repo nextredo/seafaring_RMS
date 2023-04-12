@@ -10,7 +10,7 @@
 # Example usage for CMD_SETANGLES:
 # import serial
 # from STorM32_lib import *
-# ser = serial.Serial("COM1", 115200) 
+# ser = serial.Serial("COM1", 115200)
 # cmd = cCMD_SETANGLES(ser)
 # cmd.send()
 #*****************************************************
@@ -27,17 +27,17 @@ class cSTorM32RcCmd():
     def __init__(self,ser=None,payload=None,noresponse=False):
         if noresponse:
             self.stx = b'\xF9'
-        else:    
+        else:
             self.stx = b'\xFA'
         self.stx = b'\xF9'
         self.len = b'\x00'
         self.cmd = b'\x01'
         self.payload = b''
         self.crc = b'\x33\x34'
-        
+
         self.datastream = b''
         self.ser = ser
-        
+
         if payload != None:
             self.setPayload(payload)
 
@@ -48,11 +48,11 @@ class cSTorM32RcCmd():
     def disableResponse(self):
         self.stx = b'\xF9'
         return True
-        
+
     def setPayload(self,payload):
         self.payload = payload
         return True
-        
+
     def finalize(self,noresponse=None):
         if noresponse == None:
             self.datastream = self.stx
@@ -62,7 +62,7 @@ class cSTorM32RcCmd():
             self.datastream = b'\xFA'
         self.datastream += self.len + self.cmd + self.payload + self.crc
         return True
-        
+
     def getCmd(self):
         return self.datastream
 
@@ -73,7 +73,7 @@ class cSTorM32RcCmd():
             return False
         self.ser.write(self.datastream)
         return True
-            
+
 
 #------------------------------------------------------
 # RCCMD  GetVersion  #1 = 0x01
@@ -145,8 +145,8 @@ class cCMD_SENDCAMERACOMMAND(cSTorM32RcCmd):
         self.len = len(payload).to_bytes(1,'big')
         self.payload = payload
         return True
-            
-        
+
+
 
 
 
