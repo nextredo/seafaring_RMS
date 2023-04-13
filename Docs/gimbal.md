@@ -5,10 +5,13 @@
 ## Common Gimbals
 
 - [List of common gimbals from the Ardupilot website](https://ardupilot.org/copter/docs/common-cameras-and-gimbals.html#common-cameras-and-gimbals)
+- [List of gimbals from the STorM32 wiki](http://www.olliw.eu/storm32bgc-wiki/Example_Setups)
 
 ## Stock Gimbal Configuration
 
 - [Link to AliExpress listing for the gimbal](https://www.aliexpress.com/item/1005002165612156.html)
+- [Pinout](http://www.olliw.eu/storm32bgc-wiki/Pins_and_Connectors)
+  - [Pin functions](http://www.olliw.eu/storm32bgc-wiki/Ports_and_Pins_by_Function)
 
 ### Gimbal Default Parameters & Factory Setup
 
@@ -44,6 +47,7 @@ Baud rate: 115200
   - `cd ~/.wine/dosdevices/`
   - `ln -sf /dev/ttyACM0 com1`
     - Overwrites com1 symlink to point to gimbal
+    - Do this every time you start the program
 - Run through Wine
 
 ## Gimbal Control
