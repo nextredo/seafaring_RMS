@@ -14,17 +14,22 @@ Class construction based off the following:
 # todo instead of superclassing, make the serial manager a subclass with it's own functions
 # todo fix angle ranging inconsistencies (should always be [-360, 360])
     # mainly functions like CMD_SETPITCH etc.
+# todo pygame keyboard control
+# todo functions to read min and maxes for axes
+# todo figure out how to make
+# todo serial response decoded
 
 import struct
 
 import serial
+import termcolor
 
 from .crc import x25crc
-from .cmd_reference import cmd_ref, byte_ref, flag_ref, type_ref
+from .cmd_reference import *
 
 
-MIN_ANGLE = -180
-MAX_ANGLE =  180
+MIN_ANGLE = -95
+MAX_ANGLE = +95
 
 class serial_man:
     def __init__(self, gimbal_port: str, baud: int):
@@ -53,9 +58,19 @@ class serial_man:
             `d` for dummy CRC.
         """
         if crc_type == 'd':
-            msg = byte_ref.byte_outgoing_start.value + payload_len + cmd_byte + payload + byte_ref.bytes_dummy_crc.value
+            crc = byte_ref.bytes_dummy_crc.value
+            start_byte = byte_ref.byte_outgoing_start.value
 
+        msg = start_byte + payload_len + cmd_byte + payload + crc
         self.ser.write(msg)
+
+        if self.verbose:
+            print(f"Start byte: 0x{start_byte.hex()}")
+            print(f"Payload len byte: 0x{payload_len.hex()}")
+            print(f"Cmd byte: 0x{cmd_byte.hex()}")
+            print(f"Payload: 0x{payload.hex()}")
+            print(f"CRC: 0x{crc.hex()}")
+
         return msg
 
     def receive(self):
@@ -108,9 +123,17 @@ class serial_man:
         Parameters:
             `payload_encoding`: Either `mapped_int` or `float`
         """
+        print(f"raw angle: {angle}")
+
         # Normalising angle (degrees) to the range of [MIN_ANGLE, MAX_ANGLE]
-        if   angle >= 0: mangle = angle % MAX_ANGLE
-        else:            mangle = angle % MIN_ANGLE
+
+        if angle > MAX_ANGLE:
+            mangle = MAX_ANGLE
+            print("Angle > MAX_ANGLE, clipped to MAX_ANGLE")
+        elif angle < MIN_ANGLE:
+            mangle = MIN_ANGLE
+            print("Angle < MIN_ANGLE, clipped to MIN_ANGLE")
+
         print("mapped angle: ", mangle)
 
         if payload_encoding == "float":
@@ -118,6 +141,7 @@ class serial_man:
 
         elif payload_encoding == "mapped_int":
             mapped_int = int(serial_man.map_range(mangle, MIN_ANGLE, MAX_ANGLE, 700, 2300))
+            print(f"mapped_int: {mapped_int}")
             return serial_man.int_to_bytes(mapped_int)
 
 
@@ -149,6 +173,10 @@ class storm32(serial_man):
     # --------------------------------------------------------------------------
     def set_angles(self, pitch: float, roll: float, yaw: float):
 
+        if self.verbose:
+            print("--------------------------")
+            print(rc_cmd_ref.CMD_SETANGLES.name)
+
         # Encode floats into formatted payload bytes
         pitch_payload = serial_man.encode_angle(pitch, "float")
         roll_payload  = serial_man.encode_angle(roll,  "float")
@@ -165,15 +193,13 @@ class storm32(serial_man):
 
         # Sending command to gimbal
         set_angles_msg = self.send(
-            cmd_byte=cmd_ref.CMD_SETANGLES.value,
+            cmd_byte=rc_cmd_ref.CMD_SETANGLES.value,
             payload=payload,
             payload_len=int.to_bytes(len(payload)),
             crc_type='d'
         )
 
         if self.verbose:
-            print(cmd_ref.CMD_SETANGLES.name)
-            print(f"{pitch}, {roll}, {yaw} degrees")
             print("->", serial_man.format_cmd_string(set_angles_msg, hex_prefix=False))
 
         return
@@ -185,12 +211,15 @@ class storm32(serial_man):
         return
 
     def set_yaw(self, yaw: float):
-        yaw_payload = serial_man.encode_angle(yaw, "mapped_int")
-        yaw_msg     = self.send(cmd_ref.CMD_SETYAW.value, yaw_payload, b'\x02', crc_type='d')
 
         if self.verbose:
-            print(cmd_ref.CMD_SETYAW.name)
-            print(f"{yaw} degrees")
+            print("--------------------------")
+            print(rc_cmd_ref.CMD_SETYAW.name)
+
+        yaw_payload = serial_man.encode_angle(yaw, "mapped_int")
+        yaw_msg     = self.send(rc_cmd_ref.CMD_SETYAW.value, yaw_payload, b'\x02', crc_type='d')
+
+        if self.verbose:
             print("->", serial_man.format_cmd_string(yaw_msg, hex_prefix=False))
 
         return
@@ -202,6 +231,10 @@ class storm32(serial_man):
         return
 
     def disable_motors(self):
+        return
+
+    def restart_gimbal(self):
+        # Necessary as sometimes control loop can become baked from large disturbances
         return
 
     def center_gimbal(self):
