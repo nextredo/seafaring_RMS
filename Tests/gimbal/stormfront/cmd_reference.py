@@ -13,14 +13,49 @@ See [Serial Communication](http://www.olliw.eu/storm32bgc-wiki/Serial_Communicat
 from enum import Enum
 from builtins import object
 
-class cmd_ref(Enum):
+class simple_cmd_ref(Enum):
+    PING                   = b't'
+    VERSION                = b'v'
+    GET_PARAMETERS         = b'g'
+    SET_PARAMETERS         = b'p'
+    GET_CURRENT_DATA       = b'd'
+    GET_CURRENT_DATA_SHORT = b's'
+
+class rc_cmd_ref(Enum):
     """
     Enum of command reference bytes
     """
-    CMD_SETPITCH  = b'\x0A' #10
-    CMD_SETROLL   = b'\x0B' #11
-    CMD_SETYAW    = b'\x0C' #12
-    CMD_SETANGLES = b'\x11' #17
+    CMD_GETVERSION             = b'\x01' #1
+    CMD_GETVERSIONSTR          = b'\x02' #2
+    CMD_GETPARAMETER           = b'\x03' #3
+    CMD_SETPARAMETER           = b'\x04' #4
+    CMD_GETDATA                = b'\x05' #5
+    CMD_GETDATAFIELDS          = b'\x06' #6
+    CMD_SETPITCH               = b'\x0A' #10
+    CMD_SETROLL                = b'\x0B' #11
+    CMD_SETYAW                 = b'\x0C' #12
+    CMD_SETPANMODE             = b'\x0D' #13
+    CMD_SETSTANDBY             = b'\x0E' #14
+    CMD_DOCAMERA               = b'\x0F' #15
+    CMD_SETSCRIPTCONTROL       = b'\x10' #16
+    CMD_SETANGLES              = b'\x11' #17
+    CMD_SETPITCHROLLYAW        = b'\x12' #18
+    CMD_SETPWMOUT              = b'\x13' #19
+    CMD_RESTOREPARAMETER       = b'\x14' #20
+    CMD_RESTOREALLPARAMETER    = b'\x15' #21
+    CMD_SETINPUTS              = b'\x16' #22
+    # CMD_SETHOMELOCATION        = b'\x17' #23 DEPRECATED
+    # CMD_SETTARGETLOCATION      = b'\x18' #24 DEPRECATED
+    CMD_SETINPUTCHANNEL        = b'\x19' #25
+    CMD_SETCAMERA              = b'\x1A' #26
+    CMD_SENDCAMERACOMMAND      = b'\x1B' #27
+    CMD_SETANGLES_UNRESTRICTED = b'\x1C' #28
+    CMD_ACTIVEPANMODESETTING   = b'\x64' #100
+    # CMD_CONNECT                = b'\xD2' #210 DEPRECATED
+    # CMD_GETDATADISPLAY         = b'\xD5' #213 DEPRECATED
+    # CMD_WIFICONNECTEDPING      = b'\xD7' #215 DEPRECATED
+    # CMD_STORM32LINK_V1         = b'\xD9' #217 DEPRECATED
+    # CMD_STORM32LINK_V2         = b'\xDA' #218 SPECIAL
 
 class byte_ref(Enum):
     """
@@ -44,6 +79,11 @@ class type_ref(Enum):
     """
     type_gimbal_frame_euler_angles = b'\x00'
 
+class response_ref(Enum):
+    CMD_ACK = b'\x96' #150
+
+# class parameter_ref(Enum):
+#     d = "d"
 
 # todo change enums to the below
 # class command():
