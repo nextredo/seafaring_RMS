@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 gimbal_port = "/dev/ttyACM0"
 baud = 115200
 
