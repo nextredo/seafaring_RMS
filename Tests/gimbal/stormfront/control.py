@@ -151,6 +151,7 @@ class serial_man:
 
     def check_crc(self, packet):
         # todo stub
+        ...
         return True
 
     def decode_ack(self, packet: bytes):
@@ -166,6 +167,7 @@ class serial_man:
         return True
 
     def decode_getdata(self, packet: bytes):
+        ...
         return
 
     def decode_getdatafields(self, packet: bytes):
@@ -191,12 +193,15 @@ class serial_man:
         return True
 
     def decode_getparameter(self, packet: bytes):
+        ...
         return
 
     def decode_getversion(self, packet: bytes):
+        ...
         return
 
     def decode_getversionstr(self, packet: bytes):
+        ...
         return
 
     # Static methods -----------------------------------------------------------
@@ -304,6 +309,7 @@ class storm32(serial_man):
     # Getters ------------------------------------------------------------------
     # --------------------------------------------------------------------------
     def get_firmware_version(self):
+        ...
         return
 
     def get_live_data(self):
@@ -327,6 +333,7 @@ class storm32(serial_man):
 
 
     def get_imu_angles(self):
+        ...
         return
 
     # Setters ------------------------------------------------------------------
@@ -365,9 +372,11 @@ class storm32(serial_man):
         return
 
     def set_pitch(self, pitch: float):
+        ...
         return
 
     def set_roll(self, roll: float):
+        ...
         return
 
     def set_yaw(self, yaw: float):
@@ -386,15 +395,19 @@ class storm32(serial_man):
         return
 
     def set_angle_limits(self):
+        ...
         return
 
     def enable_motors(self):
+        ...
         return
 
     def disable_motors(self):
+        ...
         return
 
     def restart_gimbal(self):
+        ...
         # Necessary as sometimes control loop can become baked from large disturbances
         return
 
