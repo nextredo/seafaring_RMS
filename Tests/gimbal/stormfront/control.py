@@ -19,6 +19,7 @@ Class construction based off the following:
 # todo serial response decoded
 
 import struct
+import time
 
 import serial
 from colorama import Fore
@@ -27,7 +28,7 @@ from colorama import Style
 from .crc import x25crc
 from .cmd_reference import *
 
-
+# todo make these class vars that are acutally read from teh gimbal
 MIN_ANGLE = -95
 MAX_ANGLE = +95
 
@@ -85,7 +86,117 @@ class serial_man:
 
         return msg
 
-    def receive(self):
+    def receive(self, seconds=2):
+        """
+        Method to receive a packet from the gimbal.
+        Call after sending a message,
+
+        Arguments:
+            `seconds` - Time to wait before beginning reception. Allows serial buffer
+            to collect data before decoding the packet (otherwise partial packets are decoded).
+        """
+
+        if self.verbose: print("---- receiving ----")
+
+        time.sleep(seconds)
+        available = self.ser.in_waiting
+        if available > 0:
+            # get packet as byte str, reading n bytes from serial interface
+            received = self.ser.read(available)
+
+            if self.verbose:
+                received_formatted = serial_man.format_byte_string(received)
+                print("<- ", received_formatted)
+
+            # check startsign byte
+            if bytes([received[0]]) == byte_ref.byte_incoming_start.value:
+
+                # check command byte (using elif as match case only > Python 3.10)
+                # sends packet to relevant decoding function
+                if   bytes([received[2]]) == response_ref.CMD_ACK.value:
+                    self.decode_ack(received)
+                elif bytes([received[2]]) == response_ref.CMD_GETDATA.value:
+                    self.decode_getdata(received)
+                elif bytes([received[2]]) == response_ref.CMD_GETDATAFIELDS.value:
+                    self.decode_getdatafields(received)
+                elif bytes([received[2]]) == response_ref.CMD_GETPARAMETER.value:
+                    self.decode_getparameter(received)
+                elif bytes([received[2]]) == response_ref.CMD_GETVERSION.value:
+                    self.decode_getversion(received)
+                elif bytes([received[2]]) == response_ref.CMD_GETVERSIONSTR.value:
+                    self.decode_getversionstr(received)
+
+        # check if packet was fully decoded (that nothing is waiting in serial)
+        if self.ser.in_waiting:
+            print("Potential partial packet decode?")
+
+        print("---- received ----\n")
+
+        return
+
+    def listen(self, seconds=3):
+        """
+        Method to read bytes from board (without decode) for `n` seconds.
+        """
+
+        time.sleep(0.1)
+        t_end = time.time() + seconds
+        while time.time() < t_end:
+            available = self.ser.in_waiting
+            if available > 0:
+                c = self.ser.read(available)
+                c_formatted = storm32.format_byte_string(c)
+                print("<- ", c, "\t", c_formatted)
+                # print("<- ", c)
+
+    def check_crc(self, packet):
+        # todo stub
+        return True
+
+    def decode_ack(self, packet: bytes):
+
+        # ensure crc check passes
+        if not self.check_crc(packet): return False
+
+        # payload len should always be 1 for ACK message
+        if packet[1] == 1:
+            # print message received
+            print(ack_ref.get(bytes([packet[3]]), "bad ack received"))
+
+        return True
+
+    def decode_getdata(self, packet: bytes):
+        return
+
+    def decode_getdatafields(self, packet: bytes):
+
+        # ensure crc check passes
+        if not self.check_crc(packet): return False
+
+        # bytes 3 & 4 in reverse order = type of data being received here
+        # bitmask_word = packet[4:2:-1]
+
+        # bytes 3 & 4 in normal order = type of data being received here
+        bitmask_word = packet[3:5:1]
+        print(live_data_ref_decode[bitmask_word] + "\t")
+        print("packet payload len:" + str(packet[2]))
+
+        # loop over datastream in packet (from byte 5 until end (excl. last 2 bytes for CRC))
+        # for i in range(5, 5 + packet[2]):
+        #     print(packet[i])
+
+        # print datastream as a big hex value
+        print("data: " + serial_man.format_byte_string(packet[5:5+packet[2]]))
+
+        return True
+
+    def decode_getparameter(self, packet: bytes):
+        return
+
+    def decode_getversion(self, packet: bytes):
+        return
+
+    def decode_getversionstr(self, packet: bytes):
         return
 
     # Static methods -----------------------------------------------------------
@@ -194,6 +305,26 @@ class storm32(serial_man):
     # --------------------------------------------------------------------------
     def get_firmware_version(self):
         return
+
+    def get_live_data(self):
+
+        if self.verbose:
+            print("--------------------------")
+            print(rc_cmd_ref.CMD_GETDATAFIELDS.name)
+
+        payload = b''.join([
+
+        ])
+
+        data_msg = self.send(
+            cmd_byte=rc_cmd_ref.CMD_GETDATAFIELDS.value,
+            payload=live_data_ref.IMU1ANGLES.value,
+            payload_len=b'\x02',
+        )
+        if self.verbose:
+            print("->", serial_man.format_byte_string(data_msg))
+            print("------ sent ------\n")
+
 
     def get_imu_angles(self):
         return
