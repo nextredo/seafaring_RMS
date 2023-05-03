@@ -21,7 +21,8 @@ Class construction based off the following:
 import struct
 
 import serial
-import termcolor
+from colorama import Fore
+from colorama import Style
 
 from .crc import x25crc
 from .cmd_reference import *
@@ -29,6 +30,18 @@ from .cmd_reference import *
 
 MIN_ANGLE = -95
 MAX_ANGLE = +95
+
+# Used to increment colour in serial_man.format_byte_string()
+colours = [
+    Fore.BLACK,
+    Fore.RED,
+    Fore.GREEN,
+    Fore.YELLOW,
+    Fore.BLUE,
+    Fore.MAGENTA,
+    Fore.CYAN,
+    Fore.WHITE,
+]
 
 class serial_man:
     def __init__(self, gimbal_port: str, baud: int):
@@ -92,7 +105,7 @@ class serial_man:
         return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
 
     @staticmethod
-    def format_cmd_string(command: str | bytes, hex_prefix=True):
+    def format_byte_string(command: str | bytes, hex_prefix=True, coloured=True):
         if type(command) == str:
             hex_str = bytes(command, "utf-8").hex()
 
@@ -101,6 +114,23 @@ class serial_man:
 
         # Make hex values uppercase
         formatted_command = hex_str.upper()
+
+        if coloured:
+            # turn string into list
+            coloured_command = []
+            current_colour_idx = 0
+            for string_idx, char in enumerate(formatted_command):
+                coloured_command.append(formatted_command[string_idx])
+
+                # if index in string is even, increment colour
+                if string_idx % 2:
+                    current_colour_idx += 1
+                    current_colour_idx = current_colour_idx % len(colours)
+                    coloured_command.append(colours[current_colour_idx])
+
+            # reset string colouring
+            coloured_command.append(Style.RESET_ALL)
+            formatted_command = "".join(coloured_command)
 
         if hex_prefix:
             formatted_command = "0x" + formatted_command
@@ -122,8 +152,6 @@ class serial_man:
         Parameters:
             `payload_encoding`: Either `mapped_int` or `float`
         """
-        print(f"raw angle: {angle}")
-
         # Normalising angle (degrees) to the range of [MIN_ANGLE, MAX_ANGLE]
 
         if angle > MAX_ANGLE:
@@ -132,8 +160,10 @@ class serial_man:
         elif angle < MIN_ANGLE:
             mangle = MIN_ANGLE
             print("Angle < MIN_ANGLE, clipped to MIN_ANGLE")
+        else:
+            mangle = angle
 
-        print("mapped angle: ", mangle)
+        print(f"Angle: {angle} --> {mangle}")
 
         if payload_encoding == "float":
             return serial_man.float_to_bytes(mangle)
@@ -195,11 +225,11 @@ class storm32(serial_man):
             cmd_byte=rc_cmd_ref.CMD_SETANGLES.value,
             payload=payload,
             payload_len=int.to_bytes(len(payload)),
-            crc_type='d'
         )
 
         if self.verbose:
-            print("->", serial_man.format_cmd_string(set_angles_msg, hex_prefix=False))
+            print("->", serial_man.format_byte_string(set_angles_msg))
+            print("------ sent ------\n")
 
         return
 
@@ -216,10 +246,11 @@ class storm32(serial_man):
             print(rc_cmd_ref.CMD_SETYAW.name)
 
         yaw_payload = serial_man.encode_angle(yaw, "mapped_int")
-        yaw_msg     = self.send(rc_cmd_ref.CMD_SETYAW.value, yaw_payload, b'\x02', crc_type='d')
+        yaw_msg     = self.send(rc_cmd_ref.CMD_SETYAW.value, yaw_payload, b'\x02')
 
         if self.verbose:
-            print("->", serial_man.format_cmd_string(yaw_msg, hex_prefix=False))
+            print("->", serial_man.format_byte_string(yaw_msg))
+            print("------ sent ------\n")
 
         return
 
