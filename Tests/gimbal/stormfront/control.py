@@ -10,8 +10,7 @@ Class construction based off the following:
 
 # todo implement serial commands
 # todo implement RC commands
-# todo lookup table for commands (CMD_SETPITCH = b'\x0A' etc.)
-# todo instead of superclassing, make the serial manager a subclass with it's own functions
+# todo instead of superclassing, make the serial manager a subclass with its own functions
 # todo fix angle ranging inconsistencies (should always be [-360, 360])
     # mainly functions like CMD_SETPITCH etc.
 # todo pygame keyboard control

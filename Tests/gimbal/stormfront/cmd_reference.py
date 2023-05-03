@@ -82,6 +82,86 @@ class type_ref(Enum):
 class response_ref(Enum):
     CMD_ACK = b'\x96' #150
 
+# STorM32 states
+class state_ref(Enum):
+    STARTUP_MOTORS         = b'\x00\x00'
+    STARTUP_SETTLE         = b'\x00\x01'
+    STARTUP_CALIBRATE      = b'\x00\x02'
+    STARTUP_LEVEL          = b'\x00\x03'
+    STARTUP_MOTORDIRDETECT = b'\x00\x04'
+    STARTUP_RELEVEL        = b'\x00\x05'
+    NORMAL                 = b'\x00\x06'
+    STARTUP_FASTLEVEL      = b'\x00\x07'
+
+# flags for reading live data from the STorM32, requested with RCcmd GetDataFields
+class live_data_ref(Enum):
+    STATUS_V1         = b'\x00\x01'
+    TIMES             = b'\x00\x02'
+    IMU1GYRO          = b'\x00\x04'
+    IMU1ACC           = b'\x00\x08'
+    IMU1R             = b'\x00\x10'
+    IMU1ANGLES        = b'\x00\x20'
+    PIDCTRL           = b'\x00\x40'
+    INPUTS            = b'\x00\x80'
+    IMU2ANGLES        = b'\x01\x00'
+    MAGANGLES         = b'\x02\x00'
+    STORM32LINK       = b'\x04\x00'
+    IMUACCCONFIDENCE  = b'\x08\x00'
+    ATTITUDE_RELATIVE = b'\x10\x00'
+    STATUS_V2         = b'\x20\x00'
+    ENCODERANGLES     = b'\x40\x00'
+    IMUACCABS         = b'\x80\x00'
+
+class pan_mode_ref(Enum):
+    OFF            = b'\x00'
+    HOLD_HOLD_PAN  = b'\x01'
+    HOLD_HOLD_HOLD = b'\x02'
+    PAN_PAN_PAN    = b'\x03'
+    PAN_HOLD_HOLD  = b'\x04'
+    PAN_HOLD_PAN   = b'\x05'
+    HOLD_PAN_PAN   = b'\x06'
+
+
+class do_camera_ref(Enum):
+    STORM32DOCAMERA_OFF      = b'\x00'
+    STORM32DOCAMERA_SHUTTER  = b'\x01'
+    STORM32DOCAMERA_VIDEOON  = b'\x03'
+    STORM32DOCAMERA_VIDEOOFF = b'\x04'
+
+
+class link_fc_status_ref(Enum):
+    AP_AHRS_HEALTHY     = b'\x01' # => Q ok, ca. 15 secs
+    AP_AHRS_INITIALIZED = b'\x02' # => vz ok, ca. 32 secs
+    AP_GPS_3DFIX        = b'\x04' # ca 60-XXs
+    AP_NAVHORIZVEL      = b'\x08' # comes very late, after GPS fix and few secs after position_ok()
+    AP_ARMED            = b'\x40' # tells when copter is about to take-off
+    IS_ARDUPILOT        = b'\x80' # permanently set if it's ArduPilot, so STorM32 knows about and can act accordingly
+
+
+class len_ref(Enum):
+    header_len = 3
+    crc_len    = 2
+    frame_len  = 5
+    max_response_len = 77
+
+
+# todo shouldn't need these. Just embed the values as part of the methods the
+# user calls to do stuff to / get stuff from the gimbal
+#define STORM32RCCMD_GET_VERSIONSTR_OUTLEN       0x00
+#define STORM32RCCMD_GET_DATAFIELDS_OUTLEN       0x02
+#define STORM32RCCMD_SET_PANMODE_OUTLEN          0x01
+#define STORM32RCCMD_DO_CAMERA_OUTLEN            0x06
+#define STORM32RCCMD_SET_ANGLES_OUTLEN           0x0E
+#define STORM32RCCMD_SET_PITCHROLLYAW_OUTLEN     0x06
+#define STORM32RCCMD_SET_PWMOUT_OUTLEN           0x02
+#define STORM32RCCMD_SET_INPUTS_OUTLEN           0x17
+#define STORM32RCCMD_SET_HOMELOCATION_OUTLEN     0x0E
+#define STORM32RCCMD_SET_TARGETLOCATION_OUTLEN   0x0E
+#define STORM32RCCMD_SET_INPUTCHANNEL_OUTLEN     0x04
+#define STORM32RCCMD_SET_SETCAMERA_OUTLEN        0x04
+#define STORM32RCCMD_ACTIVEPANMODESETTING_OUTLEN 0x01
+#define STORM32RCCMD_STORM32LINKV2               0x21
+
 # class parameter_ref(Enum):
 #     d = "d"
 
