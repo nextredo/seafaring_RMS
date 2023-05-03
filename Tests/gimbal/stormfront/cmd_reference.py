@@ -9,7 +9,9 @@ File containing a reference for STorM32 serial command bytes, such as:
 Makes the codebase more readable
 
 See [Serial Communication](http://www.olliw.eu/storm32bgc-wiki/Serial_Communication) on the wiki
+[The STorM32 C control library](https://github.com/olliw42/storm32bgc/blob/master/c-library/STorM32_lib.h) is also VERY helpful
 """
+
 from enum import Enum
 from builtins import object
 
@@ -59,7 +61,8 @@ class rc_cmd_ref(Enum):
 
 class byte_ref(Enum):
     """
-    Enum of miscellaneous byte references
+    Enum of miscellaneous byte references.
+    `incoming` / `outgoing` are from Python's point of view.
     """
     byte_incoming_start             = b'\xFB'
     byte_outgoing_start             = b'\xFA'
@@ -80,7 +83,12 @@ class type_ref(Enum):
     type_gimbal_frame_euler_angles = b'\x00'
 
 class response_ref(Enum):
-    CMD_ACK = b'\x96' #150
+    CMD_GETVERSION    = b'\x00' #1
+    CMD_GETVERSIONSTR = b'\x02' #2
+    CMD_GETPARAMETER  = b'\x03' #3
+    CMD_GETDATA       = b'\x05' #5
+    CMD_GETDATAFIELDS = b'\x06' #6
+    CMD_ACK           = b'\x96' #150
 
 # STorM32 states
 class state_ref(Enum):
@@ -93,7 +101,8 @@ class state_ref(Enum):
     NORMAL                 = b'\x00\x06'
     STARTUP_FASTLEVEL      = b'\x00\x07'
 
-# flags for reading live data from the STorM32, requested with RCcmd GetDataFields
+# flags for reading live data from the STorM32, requested with CMD_GETDATAFIELDS (#6)
+
 class live_data_ref(Enum):
     STATUS_V1         = b'\x00\x01'
     TIMES             = b'\x00\x02'
@@ -107,10 +116,25 @@ class live_data_ref(Enum):
     MAGANGLES         = b'\x02\x00'
     STORM32LINK       = b'\x04\x00'
     IMUACCCONFIDENCE  = b'\x08\x00'
-    ATTITUDE_RELATIVE = b'\x10\x00'
-    STATUS_V2         = b'\x20\x00'
-    ENCODERANGLES     = b'\x40\x00'
-    IMUACCABS         = b'\x80\x00'
+    # ATTITUDE_RELATIVE = b'\x10\x00' # only available in firmwares >v0.96 (T-STorM-32)
+    # STATUS_V2         = b'\x20\x00' # only available in firmwares >v0.96 (T-STorM-32)
+    # ENCODERANGLES     = b'\x40\x00' # only available in firmwares >v0.96 (T-STorM-32)
+    # IMUACCABS         = b'\x80\x00' # only available in firmwares >v0.96 (T-STorM-32)
+
+live_data_ref_decode = {
+    b'\x00\x01': 'STATUS_V1',
+    b'\x00\x02': 'TIMES',
+    b'\x00\x04': 'IMU1GYRO',
+    b'\x00\x08': 'IMU1ACC',
+    b'\x00\x10': 'IMU1R',
+    b'\x00\x20': 'IMU1ANGLES',
+    b'\x00\x40': 'PIDCTRL',
+    b'\x00\x80': 'INPUTS',
+    b'\x01\x00': 'IMU2ANGLES',
+    b'\x02\x00': 'MAGANGLES',
+    b'\x04\x00': 'STORM32LINK',
+    b'\x08\x00': 'IMUACCCONFIDENCE',
+}
 
 class pan_mode_ref(Enum):
     OFF            = b'\x00'
@@ -144,6 +168,25 @@ class len_ref(Enum):
     frame_len  = 5
     max_response_len = 77
 
+
+# class ack_ref(Enum):
+#     ACK_OK                = b'\x00'
+#     ACK_ERR_FAIL          = b'\x01'
+#     ACK_ERR_ACCESS_DENIED = b'\x02'
+#     ACK_ERR_NOT_SUPPORTED = b'\x03'
+#     ACK_ERR_TIMEOUT       = b'\x96' # 150 in decimal
+#     ACK_ERR_CRC           = b'\x97' # 151 in decimal
+#     ACK_ERR_PAYLOADLEN    = b'\x98' # 152 in decimal
+
+ack_ref = {
+    b'\x00': 'ACK_OK',
+    b'\x01': 'ACK_ERR_FAIL',
+    b'\x02': 'ACK_ERR_ACCESS_DENIED',
+    b'\x03': 'ACK_ERR_NOT_SUPPORTED',
+    b'\x96': 'ACK_ERR_TIMEOUT',
+    b'\x97': 'ACK_ERR_CRC',
+    b'\x98': 'ACK_ERR_PAYLOADLEN'
+}
 
 # todo shouldn't need these. Just embed the values as part of the methods the
 # user calls to do stuff to / get stuff from the gimbal
