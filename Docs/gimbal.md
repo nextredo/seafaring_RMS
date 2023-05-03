@@ -2,6 +2,12 @@
 
 - This document details the gimbal and everything you should need to know about it
 
+## **IMPORTANT**
+
+- Before reading the rest of this manual, note that many of the links to the OlliW wiki are wrong
+- This guide uses a hardware version 1.30 gimbal running firmware v0.96
+- This means we need to use the [old wiki pages](http://www.olliw.eu/storm32bgc-v1-wiki/Main_Page) instead of the new ones
+
 ## Common Gimbals
 
 - [List of common gimbals from the Ardupilot website](https://ardupilot.org/copter/docs/common-cameras-and-gimbals.html#common-cameras-and-gimbals)
