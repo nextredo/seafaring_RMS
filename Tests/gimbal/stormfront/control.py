@@ -44,6 +44,45 @@ colours = [
     Fore.WHITE,
 ]
 
+gimbal_state = {
+    """
+    Dict for keeping track of the gimbal's internal parameters.\n
+    `u` = uninitialised.
+    """
+    "last_updated": "u",
+    "state": "u",
+    "status": "u",
+    "status2": "u",
+    "i2c_err_count": "u",
+    "batt_voltage": "u",
+    "systicks": "u",
+    "cycle_time": "u",
+    "imu1_gx": "u",
+    "imu1_gy": "u",
+    "imu1_gz": "u",
+    "imu1_ax": "u",
+    "imu1_ay": "u",
+    "imu1_az": "u",
+    "imu1_ahrs_r_x": "u",
+    "imu1_ahrs_r_y": "u",
+    "imu1_ahrs_r_z": "u",
+    "imu1_pitch": "u",
+    "imu1_roll": "u",
+    "imu1_yaw": "u",
+    "pid_ctrl_pitch": "u",
+    "pid_ctrl_roll": "u",
+    "pid_ctrl_yaw": "u",
+    "input_pitch": "u",
+    "input_roll": "u",
+    "input_yaw": "u",
+    "imu2_pitch": "u",
+    "imu2_roll": "u",
+    "imu2_yaw": "u",
+    "mag2_yaw": "u",
+    "mag2_pitch": "u",
+    "imu_acc_confidence": "u",
+}
+
 class serial_man:
     def __init__(self, gimbal_port: str, baud: int):
         self.ser = serial.Serial(port=gimbal_port, baudrate=baud)
@@ -78,11 +117,11 @@ class serial_man:
         self.ser.write(msg)
 
         if self.verbose:
-            print(f"Start byte: 0x{start_byte.hex()}")
-            print(f"Payload len byte: 0x{payload_len.hex()}")
-            print(f"Cmd byte: 0x{cmd_byte.hex()}")
-            print(f"Payload: 0x{payload.hex()}")
-            print(f"CRC: 0x{crc.hex()}")
+            print(f"Start byte: 0x{start_byte.hex().upper()}")
+            print(f"Payload len byte: 0x{payload_len.hex().upper()}")
+            print(f"Cmd byte: 0x{cmd_byte.hex().upper()}")
+            print(f"Payload: 0x{payload.hex().upper()}")
+            print(f"CRC: 0x{crc.hex().upper()}")
 
         return msg
 
@@ -106,25 +145,41 @@ class serial_man:
 
             if self.verbose:
                 received_formatted = serial_man.format_byte_string(received)
-                print("<- ", received_formatted)
+                print("<-", received_formatted)
 
             # check startsign byte
             if bytes([received[0]]) == byte_ref.byte_incoming_start.value:
 
-                # check command byte (using elif as match case only > Python 3.10)
+                # check command byte (using elif as match case only >= Python 3.10)
                 # sends packet to relevant decoding function
-                if   bytes([received[2]]) == response_ref.CMD_ACK.value:
+                cmd_byte = bytes([received[2]])
+
+                if   cmd_byte == response_ref.CMD_ACK.value:
+                    print(response_ref.CMD_ACK.name)
                     self.decode_ack(received)
-                elif bytes([received[2]]) == response_ref.CMD_GETDATA.value:
+
+                elif cmd_byte == response_ref.CMD_GETDATA.value:
+                    print(response_ref.CMD_GETDATA.name)
                     self.decode_getdata(received)
-                elif bytes([received[2]]) == response_ref.CMD_GETDATAFIELDS.value:
+
+                elif cmd_byte == response_ref.CMD_GETDATAFIELDS.value:
+                    print(response_ref.CMD_GETDATAFIELDS.name)
                     self.decode_getdatafields(received)
-                elif bytes([received[2]]) == response_ref.CMD_GETPARAMETER.value:
+
+                elif cmd_byte == response_ref.CMD_GETPARAMETER.value:
+                    print(response_ref.CMD_GETPARAMETER.name)
                     self.decode_getparameter(received)
-                elif bytes([received[2]]) == response_ref.CMD_GETVERSION.value:
+
+                elif cmd_byte == response_ref.CMD_GETVERSION.value:
+                    print(response_ref.CMD_GETVERSION.name)
                     self.decode_getversion(received)
-                elif bytes([received[2]]) == response_ref.CMD_GETVERSIONSTR.value:
+
+                elif cmd_byte == response_ref.CMD_GETVERSIONSTR.value:
+                    print(response_ref.CMD_GETVERSIONSTR.name)
                     self.decode_getversionstr(received)
+
+                else:
+                    print("Bad packet command byte received")
 
         # check if packet was fully decoded (that nothing is waiting in serial)
         if self.ser.in_waiting:
@@ -146,7 +201,7 @@ class serial_man:
             if available > 0:
                 c = self.ser.read(available)
                 c_formatted = storm32.format_byte_string(c)
-                print("<- ", c, "\t", c_formatted)
+                print("<-", c, "\t", c_formatted)
                 # print("<- ", c)
 
     def check_crc(self, packet):
@@ -167,7 +222,26 @@ class serial_man:
         return True
 
     def decode_getdata(self, packet: bytes):
-        ...
+
+        # ensure crc check passes
+        if not self.check_crc(packet): return False
+
+        payload_len = packet[1]
+        datastream_type = packet[3]
+        print("packet payload len: " + str(payload_len))
+        print("packet datastream type: " + str(datastream_type))
+
+        # Datastream starts at byte 5
+        # Stream type byte included just before it (byte 4, always 0x00)
+        print("datastream:", serial_man.format_byte_string(packet[5:(5+payload_len-2)]))
+
+        # todo logic to decode datastream
+            # follow decoding logic on wiki serial comms page
+
+        # set dict last updated
+        # set params in dict
+
+
         return
 
     def decode_getdatafields(self, packet: bytes):
@@ -179,16 +253,22 @@ class serial_man:
         # bitmask_word = packet[4:2:-1]
 
         # bytes 3 & 4 in normal order = type of data being received here
-        bitmask_word = packet[3:5:1]
-        print(live_data_ref_decode[bitmask_word] + "\t")
-        print("packet payload len:" + str(packet[2]))
+        bitmask_word = packet[3:5]
+        payload_len = packet[1]
+        print(live_data_ref_decode[bitmask_word])
+        print("packet payload len: " + str(payload_len))
 
-        # loop over datastream in packet (from byte 5 until end (excl. last 2 bytes for CRC))
-        # for i in range(5, 5 + packet[2]):
-        #     print(packet[i])
+        # byte 5 (indexing starts at 0) is where datastream begins
+        # length of datastream is payload len - 2 (since 2 bytes for bitmask word)
+        print("datastream:", serial_man.format_byte_string(packet[5:(5+payload_len-2)]))
 
-        # print datastream as a big hex value
-        print("data: " + serial_man.format_byte_string(packet[5:5+packet[2]]))
+        # todo
+            # decode packet payload based on bitmask word printed above
+            # use reverse of encode functions I've defined in this class
+            # see how the perl GUI decodes it
+            # see wiki page for command "d" http://www.olliw.eu/storm32bgc-v1-wiki/Serial_Communication
+            # and http://www.olliw.eu/storm32bgc-v1-wiki/Inputs_and_Functions
+            # ! Check with storm32_gui_angles_testing.md
 
         return True
 
@@ -255,11 +335,12 @@ class serial_man:
 
     @staticmethod
     def float_to_bytes(num: float):
+        # pack float into binary data
         return struct.pack("f", num)
 
     @staticmethod
     def int_to_bytes(num: int):
-        # encode as unsigned 2 bit (ushort) int, with reversed byte order
+        # Encode as unsigned 2 byte (16-bit) (ushort) int, with reversed byte order (big endian)
         return num.to_bytes(length=2)[::-1]
 
     @staticmethod
@@ -312,29 +393,49 @@ class storm32(serial_man):
         ...
         return
 
-    def get_live_data(self):
+    def get_live_data(self, datafield: bytes):
+        """
+        Get the datafield specified in datafield.
+        Call with live_data_ref.OPTION.value for the datafield parameter
+        """
+
+        # todo stub
+            # doesn't decode received data
+            # also receiving some data doesn't even work lol
 
         if self.verbose:
             print("--------------------------")
             print(rc_cmd_ref.CMD_GETDATAFIELDS.name)
 
-        payload = b''.join([
-
-        ])
-
         data_msg = self.send(
             cmd_byte=rc_cmd_ref.CMD_GETDATAFIELDS.value,
-            payload=live_data_ref.IMU1ANGLES.value,
+            # payload=live_data_ref.IMU1ANGLES.value,
+            # payload=live_data_ref.IMU2ANGLES.value,
+            # payload=live_data_ref.STATUS_V1.value,
+            payload=datafield,
             payload_len=b'\x02',
         )
         if self.verbose:
             print("->", serial_man.format_byte_string(data_msg))
             print("------ sent ------\n")
 
-
     def get_imu_angles(self):
         ...
         return
+
+    def get_data(self):
+        if self.verbose:
+            print("--------------------------")
+            print(rc_cmd_ref.CMD_GETDATA.name)
+
+        data_msg = self.send(
+            cmd_byte=rc_cmd_ref.CMD_GETDATA.value,
+            payload=b'\x00', # only type 0 supported (all)
+            payload_len=b'\x01',
+        )
+        if self.verbose:
+            print("->", serial_man.format_byte_string(data_msg))
+            print("------ sent ------\n")
 
     # Setters ------------------------------------------------------------------
     # --------------------------------------------------------------------------
