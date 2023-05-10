@@ -60,6 +60,7 @@ ffplay "rtsp://192.168.42.10:554/user=admin&password=&channel=1&stream=0.sdp"
 - FFmpeg pipeline has *significantly* less latency
   - On the order of a few seconds as versus gstreamer
 - FFmpeg appears to have a more stable pipeline?
+- Both pipelines do stutter every second in the Python livestream however
 
 <figure>
     <img src="./images/ffmpeg_vs_gstreamer_sysmon.png" width="700"/>
@@ -69,21 +70,3 @@ ffplay "rtsp://192.168.42.10:554/user=admin&password=&channel=1&stream=0.sdp"
         Highly variable region from ~20s to rightmost side of graph is during active gstreamer usage through the python livestream utility.
     </figcaption>
 </figure>
-
-<!-- ---------------------------- The CSS Zone ---------------------------- -->
-<!-- ----------------------------------------------------------------------- -->
-<style>
-figure {
-    padding: 4px;
-    margin: auto;
-    /* text-align: center; */
-}
-
-figcaption {
-    /* white-space: pre-line; */
-    display: block;
-    font-style: italic;
-    padding: 2px;
-    /* text-align: center; */
-}
-</style>
