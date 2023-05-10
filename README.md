@@ -1,4 +1,7 @@
 # Foreword
+
+**A list of all documentation can be found [in Docs/readme.md](./Docs/readme.md)**
+
 - This repository is a fork of the Global Meteor Network (GMN) [Raspberry Pi Meteor Station (RMS) repo](https://github.com/CroatianMeteorNetwork/RMS)
 - This repository is part of my final year project for my engineering bachelors
 - This project aims to expand the GMN by enabling stations to detect meteors at sea while mounted on watercraft
