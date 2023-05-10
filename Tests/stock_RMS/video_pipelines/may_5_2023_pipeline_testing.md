@@ -46,13 +46,11 @@ python -m Utils.ShowLiveStream
 ffplay "rtsp://192.168.42.10:554/user=admin&password=&channel=1&stream=0.sdp"
 ```
 
-<figure>
-    <img src="./images/python_RMS_live_stream.png" width="700"/>
-    <figcaption>
-        Screenshot of the Python `ShowLiveStream` utility.<br/>
-        Picture shows the back of my laptop as viewed by the camera.
-    </figcaption>
-</figure>
+[<img src="./images/python_RMS_live_stream.png" width="700"/>](./images/python_RMS_live_stream.png)
+<figcaption>
+    Screenshot of the Python `ShowLiveStream` utility.<br>
+    Picture shows the back of my laptop as viewed by the camera.
+</figcaption>
 
 ## Notes
 
@@ -62,11 +60,9 @@ ffplay "rtsp://192.168.42.10:554/user=admin&password=&channel=1&stream=0.sdp"
 - FFmpeg appears to have a more stable pipeline?
 - Both pipelines do stutter every second in the Python livestream however
 
-<figure>
-    <img src="./images/ffmpeg_vs_gstreamer_sysmon.png" width="700"/>
-    <figcaption>
-        Screenshot of the Gnome's System Monitor utility as running on <code>Borealis</code>.<br>
-        Flat CPU utilisation region proceeding ~45 second spike is during active FFmpeg usage through the python livestream utility.<br>
-        Highly variable region from ~20s to rightmost side of graph is during active gstreamer usage through the python livestream utility.
-    </figcaption>
-</figure>
+[<img src="./images/ffmpeg_vs_gstreamer_sysmon.png" width="700"/>](./images/ffmpeg_vs_gstreamer_sysmon.png)
+<figcaption>
+    Screenshot of the Gnome's System Monitor utility as running on <code>Borealis</code>.<br>
+    Flat CPU utilisation region proceeding ~45 second spike is during active FFmpeg usage through the python livestream utility.<br>
+    Highly variable region from ~20s to rightmost side of graph is during active gstreamer usage through the python livestream utility.
+</figcaption>
