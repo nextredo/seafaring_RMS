@@ -14,23 +14,23 @@
 > Rainy and cloudy night<br>
 > 1.5 hour capture<br>
 
-[<img src="./images/20230508195321_weather.png" width="650"/>](./images/20230508195321_weather.png)
+[<img src="./images/test_take_2/20230508195321_weather.png" width="650"/>](./images/test_take_2/20230508195321_weather.png)
 
 ## Aims & Objectives
 
 ### Aims
 
-- [ ] To test **Yaw drift** with 2nd IMU installed and operational
-- [ ] To test Camera's night vision ability
-- [ ] To test RMS as a whole (system integration test)
-- [ ] To test RMS power consumption
-- [ ] To collect data for later use in semi-automated testing
+- [x] To test **Yaw drift** with 2nd IMU installed and operational
+- [x] To test Camera's night vision ability
+- [x] To test RMS as a whole (system integration test)
+- [x] To test RMS power consumption
+- [x] To collect data for later use in semi-automated testing
 
 ### Objectives
 
-- [ ] Setup RMS facing out window
-- [ ] Begin successful data capture
-- [ ] Leave unattended for 1.5 hours
+- [x] Setup RMS facing out window
+- [x] Begin successful data capture
+- [x] Leave unattended for 1.5 hours
 - [ ] Analyse resultant data
 
 ## Requirements, Specifications, Motivations and Approach
@@ -46,14 +46,14 @@
 - Remove lens cap
 - Install power monitoring device
 - Set:
-  - Pitch = 22
+  - Pitch = -22
   - Roll = 0
   - Yaw = -20
 - Power all systems
 - Manually move camera into position using `stormfront` or GUI tool
 - Begin capture for 1.5 hours with `python -m RMS.StartCapture -d 1.5`
 
-[<img src="./images/initial_capture.png" width="700"/>](./images/initial_capture.png)
+[<img src="./images/test_take_2/initial_capture.png" width="700"/>](./images/test_take_2/initial_capture.png)
 > Initial capture as seen through VLC<br>
 > Captured 8/5/2023 - 8:17PM
 
@@ -66,11 +66,11 @@ Begun capture at 8:21pm
 
 ### Image Gallery
 
-[<img src="./images/final_capture.png" width="700"/>](./images/final_capture.png)
+[<img src="./images/test_take_2/final_capture.png" width="700"/>](./images/test_take_2/final_capture.png)
 > Final capture as seen through VLC<br>
 > Captured 8/5/2023 - 9:49PM (~1.5 hours after initial capture)
 
-[<img src="./images/resource_usage_while_operational.png" width="600"/>](./images/resource_usage_while_operational.png)
+[<img src="./images/test_take_2/resource_usage_while_operational.png" width="600"/>](./images/test_take_2/resource_usage_while_operational.png)
 > Resource usage of the RMS while operational<br>
 > Note the periodic CPU usage spikes - likely caused by the end of the previous FFTP capture block and the start of the next one (every ~10 seconds).
 
@@ -82,11 +82,25 @@ Begun capture at 8:21pm
   - Both terminals mounted at same point
   - Both using same conda env
 
+### Power Consumption
+
+- After collecting the initial sample data, I collected data on power consumption
+- Consumption from the system as a whole, and from each subsystem (in different states)
+- The table below shows the exact figures obtained:
+
+[<img src="./images/power_consumption_table.png" width="800"/>](./images/power_consumption_table.png)
+
+---
+
 ## Discussion
+
+With regards to the imagery obtained, there is no useful data.
 
 ### Yaw Drift Issue
 
 - The yaw drift issue has not been solved by the addition of a 2nd IMU
+  - I believe it has, however, made the yaw drift *slower* than it would've been without
+    - See [devlog_2023_04_14.md](../../Docs/Devlogs/devlog_2023_04_14.md) for basic single-IMU test results
 - As the system is designed to provide long videos with the camera facing one direction, this is an issue
   - Camera motion is effectively null during ~10 second FFTP capture blocks
   - However, drift over time means camera will eventually turn away from the sky
@@ -107,6 +121,13 @@ Some possible solutions are:
 - Magnetometer integration
   - Not supported - see [this wiki page](http://www.olliw.eu/storm32bgc-v1-wiki/STorM32_FAQ#What_about_the_magnetometer_support?)
   - Unable to add support in code, as gimbal firmware isn't open source
+    - Could always try reverse engineering the firmware and inserting magnetometer code
+    - But this an extremely difficult and complex endeavour
+- External Magnetometer (compass) Usage
+  - Mount a magnetometer to the camera
+  - Mount a magnetometer to the gimbal base frame
+  - Choose a desired angle between the two magnetometers
+  - Periodically apply correctional yawing to the gimbal - to ensure the camera always faces out the window
 - 2-axis gimbal
   - No yaw axis (just pitch and roll instead)
   - Means reduced stabilisation, but can't yaw drift if you have no yaw
