@@ -1,10 +1,10 @@
-# Stock RMS Test - Take 2
+# Stock RMS Test - Take 3
 
 ## Introduction
 
 - Previous test didn't produce exceptionally useful results
 - Yaw drift issue was in effect
-- This meant that the
+- This meant that the data collected was invalidated
 
 ### Conditions
 
@@ -83,11 +83,6 @@ Begun capture at ~7:15pm
 > Stack image of a meteor found during the 1.5hr capture<br>
 > Event string: `FF_XX0001_20230514_100156_668_0072704`
 
-[]()
-> Captured meteor, as a lossless h.264 video.<br>
-> Generated using `FRbinViewer.py` or `GenerateMP4s.py`
-> `python -m Utils.FRbinViewer -f mp4 /tmp/000_ball -c ~/code/seafaring_RMS/.config`
-
 ---
 
 ### Segfaulting
@@ -136,5 +131,8 @@ Note:
 - Need to launch `SkyFit2` from within the RMS repository root directory
 
 ## Discussion
+
+The obtained imagery, while not under proposed test conditions, is useful.
+Data use in a test suite and proof-of-concept are both possible.
 
 ## Conclusion
