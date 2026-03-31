@@ -6,6 +6,16 @@
 ## Table of Contents
 
 - [📁 General Documentation](../Docs/)
+  - [📁 ./Formal](./Formal/)
+    - This is the final (formal) submissions for the project
+    - It includes:
+      - [A presentation video](https://youtu.be/vuteQwDVJ7Q)
+      - [A poster](./Formal/poster.pdf)
+      - [A final report](./Formal/report.pdf)
+  - [📁 ./Conventions](./Conventions/)
+    - List of a few practices I have and tools I use to keep the repo clean
+  - [📁 ./Devlogs](./Devlogs/)
+    - Files detailing what I've done for the project on a given day
   - [📁 ./](../Docs/)
     - [📄 ./cad.md](./cad.md)
       - Documents the Computer Aided Design (CAD) work done in this project
@@ -22,10 +32,6 @@
     - [📄 ./resources.md](./resources.md)
       - List of links to online resources used in the design and construction of this project
     - [📄 ./traj_est.md](./traj_est.md)
-  - [📁 ./Conventions](../Docs/Conventions/)
-    - List of a few practices I have and tools I use to keep the repo clean
-  - [📁 ./Devlogs](../Docs/Devlogs/)
-    - Files detailing what I've done for the project on a given day
 - [📁 Tests and Test Documentation](../Tests/)
   - Directory of various tests I've performed on the system
   - Subdirectories for each subsystem
